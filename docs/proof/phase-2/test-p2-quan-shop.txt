@@ -27,3 +27,21 @@ Result:
 Ran 107 tests in 40.314s
 OK
 ```
+
+## Clean-worktree recheck
+
+Code commit tested: `288f3bf` (`AC-P2-04/05: QuanSim plan_dishes/carry, Session shop`).
+
+`git stash push -u` reported `No local changes to save`, so no stash was created or popped. The existing user stashes were preserved.
+
+```powershell
+$env:PYTHONPATH='tests;.'
+& 'C:\Program Files\Unity\Hub\Editor\6000.6.0f1\Editor\Data\PlaybackEngines\WebGLSupport\BuildTools\Emscripten\python\python.exe' -m unittest discover -s tests -v
+```
+
+Result:
+
+```
+Ran 107 tests in 43.957s
+OK
+```
