@@ -57,6 +57,35 @@ class LiveServerTest(unittest.TestCase):
         self.assertFalse(server.game._thread.is_alive())
         self.assertFalse(server._thread.is_alive())
 
+    def test_quan_hud_state_and_html_fields(self):
+        tuning = load_contract()["tuning"]
+        scenario = {
+            "random_customers": False,
+            "stock": {"ca_loc": 2, "bong_sung": 2},
+            "stoves": [{"id": "B1", "state": "cooking", "cook_ticks_left": 120,
+                        "dish": {"order_id": "C1", "dish_id": "ca_loc_nuong_trui", "base_price": 60}}],
+            "customers": [
+                {"id": "C1", "table_id": "T1", "dish_id": "ca_loc_nuong_trui", "order_status": "assigned", "reserved": {}},
+            ],
+        }
+        server = LiveServer(LiveGame("quan", tuning, scenario, 1), port=0)
+        server.start()
+        try:
+            base = f"http://127.0.0.1:{server.port}"
+            code, body = _get(base + "/state")
+            self.assertEqual(code, 200)
+            st = json.loads(body)
+            self.assertEqual(st["mode"], "quan")
+            self.assertEqual(st["stoves"][0]["dish"]["dish_id"], "ca_loc_nuong_trui")
+            code, html = _get(base + "/")
+            self.assertEqual(code, 200)
+            html_str = html.decode("utf-8")
+            self.assertIn("st.dish.dish_id", html_str)
+            self.assertIn("c.reserved", html_str)
+            self.assertIn("Kho khả dụng", html_str)
+        finally:
+            server.stop()
+
 
 if __name__ == "__main__":
     unittest.main()

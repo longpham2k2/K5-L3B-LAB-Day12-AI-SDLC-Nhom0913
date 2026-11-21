@@ -197,6 +197,7 @@ function drawGather(w, h) {
   }
   if (p && p.pos) text(`x ${p.pos[0].toFixed(1)}  d ${p.pos[1].toFixed(1)}`, 14, 52, { size: 12, color: "#9fb3c0" });
   if (p && p.catch_cd_ticks > 0) text("hồi chiêu bắt " + (p.catch_cd_ticks / 60).toFixed(1) + "s", 150, 52, { size: 12, color: "#9fb3c0" });
+  if (p && p.zero_oxy_ticks > 0) text("⚠ ngạt " + p.zero_oxy_ticks + "/60", 290, 52, { size: 12, color: "#ff8a80" });
   // giỏ (khoang) dưới
   if (snap.hold && snap.hold_capacity) {
     const cap = snap.hold_capacity, sz = Math.min(30, (w - 260) / cap - 4), y0 = h - bottom + 8;
@@ -226,8 +227,10 @@ function drawQuan(w, h) {
     const col = st.state === "cooking" ? "#e8892b" : st.state === "ready" ? "#6fbf5a" : "#6d6d72";
     ctx.fillStyle = col; ctx.fillRect(sx(st.pos[0]) - 0.8 * s, sy(st.pos[1]) - 0.8 * s, 1.6 * s, 1.6 * s);
     text(st.id, sx(st.pos[0]), sy(st.pos[1]) + 4, { size: 12, align: "center", color: "#111" });
-    if (st.dish) text(st.dish, sx(st.pos[0]), sy(st.pos[1]) - 0.95 * s, { size: 10, align: "center", color: "#2a1a0a" });
+    const dishId = st.dish ? (typeof st.dish === "string" ? st.dish : st.dish.dish_id) : null;
+    if (dishId) text(dishId, sx(st.pos[0]), sy(st.pos[1]) - 0.95 * s, { size: 10, align: "center", color: "#2a1a0a" });
     if (st.state === "cooking" && st.cook_ticks_left !== undefined) text(Math.ceil(st.cook_ticks_left / 60) + "s", sx(st.pos[0]), sy(st.pos[1]) + 1.25 * s, { size: 11, align: "center", color: "#2a1a0a" });
+    else if (st.state === "ready") text("chín (E)", sx(st.pos[0]), sy(st.pos[1]) + 1.25 * s, { size: 11, align: "center", color: "#1b4d14" });
   });
   // bàn + khách
   const patMax = (meta.patience_s || 60) * 60;
@@ -241,7 +244,12 @@ function drawQuan(w, h) {
       const cx = sx(tb.pos[0]), cy = sy(tb.pos[1]) - 1.5 * s;
       ctx.fillStyle = c.state === "eating" ? "#7bc67b" : "#f4b6c2"; ctx.beginPath(); ctx.arc(cx, cy, 0.55 * s, 0, Math.PI * 2); ctx.fill();
       text(c.dish_id || "?", cx, cy - 0.75 * s, { size: 10, align: "center", color: "#2a1a0a" });
-      if (c.patience_ticks_left !== undefined) bar(cx - 0.8 * s, cy + 0.65 * s, 1.6 * s, 5, c.patience_ticks_left / patMax, "#e57373");
+      if (c.state === "eating" && c.eat_ticks_left !== undefined) {
+        const eatMax = (meta.eat_s || 10) * 60;
+        bar(cx - 0.8 * s, cy + 0.65 * s, 1.6 * s, 5, c.eat_ticks_left / eatMax, "#66bb6a");
+      } else if (c.patience_ticks_left !== undefined) {
+        bar(cx - 0.8 * s, cy + 0.65 * s, 1.6 * s, 5, c.patience_ticks_left / patMax, "#e57373");
+      }
     }
   });
   // người chơi
@@ -258,8 +266,22 @@ function drawQuan(w, h) {
   // HUD
   text("⏱ " + fmtTime(snap.time_left_ticks), 14, 28, { size: 20 });
   text(`Tiền ${snap.money ?? 0}k · uy tín ${(snap.reputation ?? 0).toFixed(1)} · điểm ${snap.score ?? 0}`, 110, 28, { size: 16 });
-  const stock = snap.stock ? Object.keys(snap.stock).map((k) => (KIND_NAME[k] || k) + "×" + snap.stock[k]).join(", ") : "";
-  text("Kho: " + (stock || "(trống)"), 14, 52, { size: 13, color: "#cfd8dc" });
+  const reserved = {};
+  (snap.customers || []).forEach((c) => {
+    Object.entries(c.reserved || {}).forEach(([k, v]) => { reserved[k] = (reserved[k] || 0) + v; });
+  });
+  const avail = {};
+  Object.entries(snap.stock || {}).forEach(([k, v]) => {
+    const left = v - (reserved[k] || 0);
+    if (left > 0) avail[k] = left;
+  });
+  const stock = Object.keys(avail).map((k) => (KIND_NAME[k] || k) + "×" + avail[k]).join(", ");
+  const handText = snap.hand ? (typeof snap.hand === "string" ? snap.hand : (snap.hand.dish_id || "món")) : "(trống)";
+  const stoveText = (snap.stoves || []).map((st) => {
+    const d = st.dish ? (typeof st.dish === "string" ? st.dish : st.dish.dish_id) : "";
+    return `${st.id}:${st.state}${d ? "(" + d + ")" : ""}`;
+  }).join(" ");
+  text(`Kho khả dụng: ${stock || "(trống)"} · Bếp: ${stoveText || "-"} · Tay: ${handText}`, 14, 52, { size: 13, color: "#cfd8dc" });
   text("WASD/mũi tên đi · E tương tác (bếp / bàn) · R chơi lại", w - 10, h - 14, { size: 12, align: "right", color: "#9fb3c0" });
 }
 
