@@ -1,0 +1,8 @@
+test_real_browser_bench_cli_writes_five_fields (tests.test_p4_bench.BenchBrowserCli.test_real_browser_bench_cli_writes_five_fields) ... ok
+test_bad_flags_exit_2_and_missing_browser_exit_1 (tests.test_p4_bench.BenchMathAndErrors.test_bad_flags_exit_2_and_missing_browser_exit_1) ... ok
+test_contract_bench_cmd_and_exact_metrics_formula (tests.test_p4_bench.BenchMathAndErrors.test_contract_bench_cmd_and_exact_metrics_formula) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 4.275s
+
+OK

@@ -159,6 +159,46 @@ class LiveServerTest(unittest.TestCase):
         finally:
             server.stop()
 
+    def test_phase4_three_alerts_and_high_contrast_markers(self):
+        tuning = load_contract()["tuning"]
+        # Cảnh 1: Gather với oxy < 25% và Cá Sấu M1 gần người chơi
+        g_sc = {
+            "player": {"pos": [10, 12], "oxygen_ticks": 180},
+            "random_fish": False,
+            "monsters": [{"id": "M1", "kind": "ca_sau", "pos": [12, 12],
+                          "waypoints": [[8, 12], [20, 12]], "state": "chase"}],
+        }
+        srv_g = LiveServer(LiveGame("gather", tuning, g_sc, 1), port=0)
+        srv_g.start()
+        try:
+            base = f"http://127.0.0.1:{srv_g.port}"
+            st = json.loads(_get(base + "/state")[1])
+            self.assertGreater(st["player"]["oxygen_ticks"], 0)
+            self.assertLess(st["player"]["oxygen_ticks"] / st["player"]["oxygen_max_ticks"], 0.25)
+            self.assertEqual(st["monsters"][0]["state"], "chase")
+            html_str = _get(base + "/")[1].decode("utf-8")
+            for marker in ("Thủy quái!", "Oxy sắp hết!", "Hết hơi!", "Sắp giận!", "sắp giận!",
+                           "highContrast", "setHighContrast", "Tương phản", "body.hc"):
+                self.assertIn(marker, html_str)
+        finally:
+            srv_g.stop()
+
+        # Cảnh 2: Quán có khách patience < 25%
+        q_sc = {
+            "random_customers": False,
+            "stock": items("ca_loc", "ca_loc"),
+            "customers": [{"id": "C1", "table_id": "T1", "dish_id": "ca_loc_nuong_trui",
+                           "order_status": "reserved", "reserved": ["I1"], "patience_ticks_left": 300}],
+        }
+        srv_q = LiveServer(LiveGame("quan", tuning, q_sc, 1), port=0)
+        srv_q.start()
+        try:
+            st_q = json.loads(_get(f"http://127.0.0.1:{srv_q.port}/state")[1])
+            pat_max = st_q["meta"]["patience_s"] * 60
+            self.assertLess(st_q["customers"][0]["patience_ticks_left"] / pat_max, 0.25)
+        finally:
+            srv_q.stop()
+
 
 if __name__ == "__main__":
     unittest.main()
