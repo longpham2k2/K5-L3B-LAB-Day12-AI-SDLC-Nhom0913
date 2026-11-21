@@ -1,0 +1,11 @@
+# Regression P1 với số chuẩn v1.1 — 2026-11-21T04:27:18Z, commit 1dbeefd
+# Test P1 đã đổi vì luật mới (có ghi lý do trong test và commit): 6->8 đàn đầu ca; attack là nút hợp lệ; --mode day được hỗ trợ.
+----------------------------------------------------------------------
+Ran 65 tests in 5.679s
+
+OK
+
+# Toàn bộ bộ test
+Ran 117 tests in 10.119s
+
+OK

@@ -1,0 +1,23 @@
+# Smoke tích hợp hai tiến trình (TICKET-02 mục 5, phút 20) — 2026-11-21T04:27:18Z, commit 1dbeefd
+# Giỏ dùng cả 2 nguyên liệu mới (ca_keo, keo_neo); cập bến ở tick 0.
+--- dock.json
+{"gather":{"hold":["ca_loc","bong_sung","bong_sung","ca_keo","ca_keo","keo_neo"],"random_fish":false}}
+$ python3 -m chonoi.headless --mode gather --seed 42 --scenario dock.json --inputs dock-inputs.json --ticks 1 --out gather.jsonl --inventory-out catch.json
+exit=0
+--- catch.json
+{"items":{"bong_sung":2,"ca_keo":2,"ca_loc":1,"keo_neo":1}}
+--- gather_end
+{"type":"event","tick":1,"phase":"gather","name":"gather_end","data":{"reason":"docked","inventory":{"items":{"bong_sung":2,"ca_keo":2,"ca_loc":1,"keo_neo":1}}}}
+$ python3 -m chonoi.headless --mode quan --seed 42 --inventory catch.json --ticks 1200 --snapshot-every 100000 --out quan.jsonl
+exit=0
+--- quan snapshot tick 0: stock / bếp / bàn
+stock {'bong_sung': 2, 'ca_keo': 2, 'ca_loc': 1, 'keo_neo': 1}
+stoves ['B1', 'B2']
+tables ['T1', 'T2', 'T3', 'T4']
+--- khách (lọc 6 món theo kho khả dụng)
+{"type":"event","tick":120,"phase":"quan","name":"customer_arrived","data":{"order_id":"C1","table_id":"T1","dish_id":"ca_keo_nuong"}}
+{"type":"event","tick":1020,"phase":"quan","name":"customer_arrived","data":{"order_id":"C2","table_id":"T2","dish_id":"goi_bong_sung"}}
+--- kiểm tra
+ĐẠT  kho quán tick 0 == file kho gather ghi
+ĐẠT  gather_end.inventory == file kho
+ĐẠT  quán có B1,B2 và T1–T4

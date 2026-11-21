@@ -1,0 +1,48 @@
+# Smoke --mode day (TICKET-02 mục 5, phút 35–45) — 2026-11-21T04:27:18Z, commit 1dbeefd
+
+## 2a. day --days 1, không điều khiển: một Ngày tối đa 22.200 tick, chạy ≤ 20 s
+exit=0
+thời gian chạy: 0.40 s
+{"type":"event","tick":0,"phase":"gather","name":"day_start","data":{},"day":1}
+{"type":"event","tick":0,"phase":"gather","name":"day_plan","data":{"dishes":{"ca_loc_nuong_trui":3,"goi_bong_sung":3},"ingredients":{"bong_sung":6,"ca_loc":3}},"day":1}
+{"type":"event","tick":0,"phase":"gather","name":"phase_start","data":{},"day":1}
+{"type":"event","tick":10800,"phase":"gather","name":"gather_end","data":{"reason":"time","inventory":{"items":{}}},"day":1}
+{"type":"event","tick":10800,"phase":"quan","name":"phase_start","data":{},"day":1}
+{"type":"event","tick":21600,"phase":"quan","name":"quan_end","data":{"reason":"time","money":0,"earned":0,"shift_earned":0,"reputation":3.0},"day":1}
+{"type":"event","tick":21600,"phase":"shop","name":"phase_start","data":{},"day":1}
+{"type":"event","tick":22200,"phase":"shop","name":"shop_end","data":{"reason":"time"},"day":1}
+{"type":"end","ticks":22200,"sim_tick":22200,"mode":"day","state":"finished","reason":"days_complete","money":0,"earned":0,"reputation":3.0,"score":300,"days_completed":1}
+ĐẠT  một Ngày = 22.200 tick, days_complete
+ĐẠT  thứ tự đổi pha
+
+## 2b. 2 Ngày: có 200 tiền, cập bến ngay, mua oxygen trong Shop Ngày 1 -> áp dụng từ Ngày 2
+--- scenario
+{"day":{"money":200,"earned":200},"gather":{"random_fish":false}}
+--- inputs
+{"frames":[{"tick":0,"interact":true},{"tick":1,"interact":false},{"tick":10802,"buy":"oxygen"},{"tick":10803,"buy":"oxygen"},{"tick":10804,"shop_done":true}]}
+exit=0
+{"type":"event","tick":0,"phase":"gather","name":"day_start","data":{},"day":1}
+{"type":"event","tick":10803,"phase":"shop","name":"bought","data":{"upgrade":"oxygen","level":1,"price":200,"money":0},"day":1}
+{"type":"event","tick":10804,"phase":"shop","name":"buy_failed","data":{"action":"oxygen","reason":"funds"},"day":1}
+{"type":"event","tick":10805,"phase":"shop","name":"shop_end","data":{"reason":"done"},"day":1}
+{"type":"event","tick":10805,"phase":"gather","name":"day_start","data":{},"day":2}
+{"type":"event","tick":33005,"phase":"shop","name":"shop_end","data":{"reason":"time"},"day":2}
+{"type":"end","ticks":33005,"sim_tick":33005,"mode":"day","state":"finished","reason":"days_complete","money":0,"earned":200,"reputation":3.0,"score":500,"days_completed":2}
+snapshot tick 10803 shop day 1 upgrades {'oxygen': 1} active {} oxy_max None
+snapshot tick 10805 gather day 2 upgrades {'oxygen': 1} active {'oxygen': 1} oxy_max 2700
+snapshot tick 10806 gather day 2 upgrades {'oxygen': 1} active {'oxygen': 1} oxy_max 2700
+ĐẠT  mua cấp 1 trừ money, giữ earned; lần 2 thiếu tiền -> buy_failed funds
+ĐẠT  cấp mua hiện ngay, chỉ áp dụng (oxy 2700) từ Ngày 2
+ĐẠT  end: earned giữ 200, days_completed 2
+
+## 2c. 5 Ngày: kế hoạch D1–D5 công bố đúng (so với TICKET-02 mục 2)
+exit=0
+{"type":"event","tick":0,"phase":"gather","name":"day_plan","data":{"dishes":{"ca_loc_nuong_trui":3,"goi_bong_sung":3},"ingredients":{"bong_sung":6,"ca_loc":3}},"day":1}
+{"type":"event","tick":22200,"phase":"gather","name":"day_plan","data":{"dishes":{"ca_loc_nuong_trui":2,"lau_ca_linh_dien_dien":2},"ingredients":{"bong_dien_dien":2,"ca_linh":6,"ca_loc":2}},"day":2}
+{"type":"event","tick":44400,"phase":"gather","name":"day_plan","data":{"dishes":{"goi_bong_sung":2,"canh_chua_ca_loc":2,"ca_keo_nuong":2},"ingredients":{"bong_dien_dien":2,"bong_sung":4,"ca_keo":4,"ca_loc":2}},"day":3}
+{"type":"event","tick":66600,"phase":"gather","name":"day_plan","data":{"dishes":{"lau_mam":1,"ca_loc_nuong_trui":2,"goi_bong_sung":1},"ingredients":{"bong_dien_dien":1,"bong_sung":2,"ca_keo":1,"ca_linh":2,"ca_loc":2,"keo_neo":1}},"day":4}
+{"type":"event","tick":88800,"phase":"gather","name":"day_plan","data":{"dishes":{"lau_mam":1,"lau_ca_linh_dien_dien":1,"ca_loc_nuong_trui":1},"ingredients":{"bong_dien_dien":2,"ca_keo":1,"ca_linh":5,"ca_loc":1,"keo_neo":1}},"day":5}
+{"type":"end","ticks":111000,"sim_tick":111000,"mode":"day","state":"finished","reason":"days_complete","money":0,"earned":0,"reputation":3.0,"score":300,"days_completed":5}
+ĐẠT  D1–D5 đúng bảng PRD
+ĐẠT  5 Ngày: days_completed 5, ticks 5 × 22.200
+ĐẠT  tất định: cùng seed -> JSONL giống từng byte
