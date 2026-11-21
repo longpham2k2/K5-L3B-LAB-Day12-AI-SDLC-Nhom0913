@@ -1,6 +1,7 @@
 import unittest
 
 from chonoi.contract import load_contract
+from chonoi.errors import BadInput
 from chonoi.inputs import LiveInputs
 from chonoi.runner import Session
 
@@ -25,7 +26,9 @@ class QuanSlice3(unittest.TestCase):
         customer = session.snapshot()["state"] if False else session.sim.customers[0]
         self.assertEqual(customer["dish_id"], "ca_loc_nuong_trui")
         self.assertEqual(customer["reserved"], {"ca_loc": 1})
-        self.assertEqual(session.snapshot()["stock"], {})
+        self.assertEqual(customer["order_status"], "reserved")
+        self.assertEqual(customer["order_tick"], 120)
+        self.assertEqual(session.snapshot()["stock"], {"ca_loc": 1})
 
     def test_no_dish_when_no_recipe_is_cookable(self):
         session = Session("quan", self.tuning, {"stock": {}, "random_customers": True}, 1)
@@ -55,6 +58,35 @@ class QuanSlice3(unittest.TestCase):
         self.assertEqual(session.sim.customers, [])
         self.assertEqual(session.sim.reputation, 2.5)
         self.assertEqual(session.snapshot()["stock"], {"ca_loc": 1})
+
+    def test_fixture_reservation_must_match_recipe_and_stock(self):
+        scenario = {
+            "stock": {"ca_loc": 1},
+            "random_customers": False,
+            "customers": [{
+                "id": "C1",
+                "table_id": "T1",
+                "dish_id": "ca_loc_nuong_trui",
+                "reserved": {"ca_loc": 2},
+            }],
+        }
+        with self.assertRaises(BadInput):
+            Session("quan", self.tuning, scenario, 1)
+
+    def test_no_dish_does_not_allocate_customer_id(self):
+        session = Session(
+            "quan",
+            self.tuning,
+            {"stock": {}, "random_customers": True},
+            1,
+        )
+        live = LiveInputs()
+        for _ in range(119):
+            session.step(live.advance())
+
+        rows = session.step(live.advance())
+        self.assertEqual([row["name"] for row in rows], ["no_dish"])
+        self.assertEqual(session.sim.ids.new("C"), "C1")
 
 
 if __name__ == "__main__":

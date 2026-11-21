@@ -164,7 +164,13 @@ def _validate_quan(b, tuning):
         if "dish_id" in c:
             if c["dish_id"] is not None and c["dish_id"] not in tuning["menu"]:
                 raise BadInput(f"customers.{c['id']}: dish_id không có trong menu")
-        if "state" in c and c["state"] not in ("waiting", "eating"):
+        if "order_tick" in c:
+            _nonneg_int(f"customers.{c['id']}.order_tick", c["order_tick"])
+        order_status = c.get("order_status", "reserved")
+        if order_status not in ("reserved", "assigned", "unfulfillable", "served"):
+            raise BadInput(f"customers.{c['id']}: order_status không hợp lệ")
+        state = c.get("state", "waiting")
+        if state not in ("waiting", "eating"):
             raise BadInput(f"customers.{c['id']}: state phải là waiting hoặc eating")
         if "patience_ticks_left" in c:
             _nonneg_int(f"customers.{c['id']}.patience_ticks_left", c["patience_ticks_left"])
@@ -173,5 +179,48 @@ def _validate_quan(b, tuning):
                 validate_items(c["reserved"])
             except BadInput as e:
                 raise BadInput(f"customers.{c['id']}.reserved: {e}")
+        if order_status in ("assigned", "unfulfillable") and c.get("reserved", {}) != {}:
+            raise BadInput(f"customers.{c['id']}: reserved phải rỗng")
+        if order_status == "assigned" and state != "waiting":
+            raise BadInput(f"customers.{c['id']}: đơn assigned phải đang waiting")
+        if order_status == "unfulfillable" and state != "waiting":
+            raise BadInput(f"customers.{c['id']}: đơn unfulfillable phải đang waiting")
+        if state == "waiting":
+            dish_id = c.get("dish_id")
+            reserved = c.get("reserved")
+            if dish_id is not None:
+                recipe = tuning["menu"][dish_id]["recipe"]
+                if reserved is not None and reserved != recipe:
+                    raise BadInput(f"customers.{c['id']}: giữ khác công thức món")
+            if reserved is not None:
+                if "stock" in b:
+                    stock = b["stock"]
+                    for item, amount in reserved.items():
+                        if amount > stock.get(item, 0):
+                            raise BadInput(f"customers.{c['id']}: giữ vượt tồn kho")
+        elif state == "eating":
+            if c.get("order_status") != "served":
+                raise BadInput(f"customers.{c['id']}: khách eating phải là served")
+            if "eat_ticks_left" not in c:
+                raise BadInput(f"customers.{c['id']}: eating thiếu eat_ticks_left")
+            eat_ticks = c["eat_ticks_left"]
+            if isinstance(eat_ticks, bool) or not isinstance(eat_ticks, int) or eat_ticks <= 0:
+                raise BadInput(f"customers.{c['id']}.eat_ticks_left phải là số nguyên dương")
+            if "base_price" not in c or isinstance(c["base_price"], bool) or not isinstance(c["base_price"], int) or c["base_price"] <= 0:
+                raise BadInput(f"customers.{c['id']}: eating khai base_price nguyên dương")
+            if "tip" in c:
+                _nonneg_int(f"customers.{c['id']}.tip", c["tip"])
     if len(table_ids) != len(set(table_ids)):
         raise BadInput("hai khách cùng bàn")
+    if "stock" in b:
+        reserved_total = {}
+        for c in b.get("customers", []):
+            reserved = c.get("reserved")
+            if reserved is None and c.get("state", "waiting") == "waiting" and c.get("dish_id") in tuning["menu"]:
+                reserved = tuning["menu"][c["dish_id"]]["recipe"]
+            if reserved:
+                for item, amount in reserved.items():
+                    reserved_total[item] = reserved_total.get(item, 0) + amount
+        for item, amount in reserved_total.items():
+            if amount > b["stock"].get(item, 0):
+                raise BadInput("tổng giữ chỗ nguyên liệu vượt tồn kho")

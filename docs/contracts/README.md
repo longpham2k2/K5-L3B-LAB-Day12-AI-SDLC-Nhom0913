@@ -35,8 +35,8 @@ Nguồn: PRD-0 mục D, E, G (`docs/prd/phase-1.md`). Đổi hợp đồng: báo
 | `oxygen_empty` / `choke` | `oxygen_ticks: 0` / `hp` | gather (lát 1) | xong |
 | `faint` | `cause: "choke", lost, hp: 0` | gather (lát 1) | xong |
 | `gather_end` | `reason (time/docked/fainted), inventory` | gather | xong |
-| `customer_arrived` / `no_dish` | `order_id, table_id, dish_id` / `{}` | quan (lát 3 — Huy) | |
-| `customer_left` | `order_id, table_id, reason (patience/closing), reputation` | quan (lát 3 — Huy) | |
+| `customer_arrived` / `no_dish` | `order_id, table_id, dish_id` / `{}` | quan (lát 3 — Huy) | xong |
+| `customer_left` | `order_id, table_id, reason (patience/closing), reputation` | quan (lát 3 — Huy) | xong |
 | `cook_started` | `stove_id, order_id, dish_id, items, base_price` | quan (lát 4 — Duy) | |
 | `dish_ready` / `dish_picked` | `stove_id, order_id, dish_id` | quan (lát 4 — Duy) | |
 | `served` | `order_id, table_id, dish_id, patience_ticks_left, base_price, tip` | quan (lát 4 — Duy) | |
