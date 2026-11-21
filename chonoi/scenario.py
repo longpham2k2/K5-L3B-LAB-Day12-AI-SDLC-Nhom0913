@@ -215,9 +215,10 @@ def _validate_quan(b, tuning):
     if "stock" in b:
         reserved_total = {}
         for c in b.get("customers", []):
-            reserved = c.get("reserved")
-            if reserved is None and c.get("state", "waiting") == "waiting" and c.get("dish_id") in tuning["menu"]:
-                reserved = tuning["menu"][c["dish_id"]]["recipe"]
+            if "reserved" in c:
+                reserved = c["reserved"]
+            else:
+                reserved = None
             if reserved:
                 for item, amount in reserved.items():
                     reserved_total[item] = reserved_total.get(item, 0) + amount

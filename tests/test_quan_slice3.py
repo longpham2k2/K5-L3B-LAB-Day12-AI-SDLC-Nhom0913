@@ -88,6 +88,47 @@ class QuanSlice3(unittest.TestCase):
         self.assertEqual([row["name"] for row in rows], ["no_dish"])
         self.assertEqual(session.sim.ids.new("C"), "C1")
 
+    def test_closing_leaves_waiting_customer_before_quan_end(self):
+        scenario = {
+            "stock": {"ca_loc": 1},
+            "random_customers": False,
+            "time_left_ticks": 1,
+            "customers": [{
+                "id": "C1",
+                "table_id": "T1",
+                "dish_id": "ca_loc_nuong_trui",
+                "patience_ticks_left": 1,
+            }],
+        }
+        session = Session("quan", self.tuning, scenario, 1)
+        rows = session.step(LiveInputs().advance())
+        self.assertEqual([row["name"] for row in rows], ["customer_left", "quan_end"])
+        self.assertEqual(rows[0]["data"]["reason"], "closing")
+        self.assertEqual(rows[0]["data"]["reputation"], 3.0)
+        self.assertTrue(session.done)
+        self.assertEqual(session.sim.customers, [])
+
+    def test_missing_reservation_without_stock_is_unfulfillable(self):
+        session = Session(
+            "quan",
+            self.tuning,
+            {
+                "stock": {},
+                "random_customers": False,
+                "customers": [{
+                    "id": "C1",
+                    "table_id": "T1",
+                    "dish_id": "ca_loc_nuong_trui",
+                    "order_tick": 5,
+                }],
+            },
+            1,
+        )
+        customer = session.sim.customers[0]
+        self.assertEqual(customer["order_status"], "unfulfillable")
+        self.assertEqual(customer["reserved"], {})
+        self.assertIsNone(customer["dish_id"])
+
 
 if __name__ == "__main__":
     unittest.main()

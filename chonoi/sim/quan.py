@@ -7,7 +7,7 @@ Nhóm viết tiếp (PRD-0 mục F, Quán):
                      ăn xong trả tiền (paid), boa, uy tín, hết ca (quan_end).
 """
 
-from ..ids import sort_by_id
+from ..ids import id_key, sort_by_id
 from ..errors import BadInput
 from .ramp import ramp_velocity
 
@@ -45,11 +45,21 @@ class QuanSim:
         self.elapsed_ticks = 0
         self.random_customers = scenario.get("random_customers", True)
         self.customers = []
-        for source in sort_by_id(scenario.get("customers", [])):
+        sources = scenario.get("customers", [])
+        explicit_sources = [source for source in sources if "reserved" in source]
+        implicit_sources = [source for source in sources if "reserved" not in source]
+        for source in sort_by_id(explicit_sources):
             ids.reserve(source["id"])
             customer = self._normalize_customer(source)
-            if customer is not None:
-                self.customers.append(customer)
+            self.customers.append(customer)
+        implicit_sources.sort(key=lambda source: (
+            int(source.get("order_tick", 0)),
+            id_key(source["table_id"]),
+        ))
+        for source in implicit_sources:
+            ids.reserve(source["id"])
+            customer = self._normalize_customer(source)
+            self.customers.append(customer)
         reserved_total = self._reserved_total()
         for item, amount in reserved_total.items():
             if amount > int(self.stock.get(item, 0)):
@@ -100,19 +110,21 @@ class QuanSim:
         # (4) khách ăn xong/khách hết kiên nhẫn theo id bàn
         for table in sort_by_id(list(self.tables)):
             customer = next((c for c in self.customers if c["table_id"] == table["id"]), None)
-            if (customer is not None and customer["state"] == "waiting"
-                    and customer["patience_ticks_left"] <= 0
-                    and self.time_left_ticks > 0):
+            if customer is not None and customer["state"] == "waiting":
+                closing = self.time_left_ticks <= 0
+                if not closing and customer["patience_ticks_left"] > 0:
+                    continue
                 self._remove_customer(customer)
-                self.reputation = max(
-                    float(self.t["reputation_min"]),
-                    min(float(self.t["reputation_max"]),
-                        self.reputation + float(self.t["left_reputation_delta"])),
-                )
+                if not closing:
+                    self.reputation = max(
+                        float(self.t["reputation_min"]),
+                        min(float(self.t["reputation_max"]),
+                            self.reputation + float(self.t["left_reputation_delta"])),
+                    )
                 events.append(("customer_left", {
                     "order_id": customer["id"],
                     "table_id": customer["table_id"],
-                    "reason": "patience",
+                    "reason": "closing" if closing else "patience",
                     "reputation": self.reputation,
                 }))
 
@@ -187,12 +199,19 @@ class QuanSim:
         elif order_status == "reserved" and dish_id:
             reserved = self._reserve_dish(dish_id) or {}
             if not reserved:
-                return None
+                order_status = "unfulfillable"
+                dish_id = None
         elif order_status == "reserved" and state == "waiting":
             dish_id = self._choose_dish()
             if dish_id is None:
-                return None
-            reserved = self._reserve_dish(dish_id) or {}
+                order_status = "unfulfillable"
+                dish_id = None
+                reserved = {}
+            else:
+                reserved = self._reserve_dish(dish_id) or {}
+                if not reserved:
+                    order_status = "unfulfillable"
+                    dish_id = None
 
         patience_ticks = source.get("patience_ticks_left")
         if patience_ticks is None:
@@ -208,7 +227,7 @@ class QuanSim:
             "state": state,
             "patience_ticks_left": int(patience_ticks),
             "eat_ticks_left": int(source.get("eat_ticks_left", 0)),
-            "order_status": source.get("order_status", "reserved"),
+            "order_status": order_status,
             "reserved": reserved,
             "base_price": base_price,
             "tip": int(source.get("tip", 0)),
