@@ -23,6 +23,38 @@ python3 -m chonoi.live --mode day --days 5                          # chơi tr�
 
 Game cần chế độ **headless** theo Test Contract (`python3 -m chonoi.headless --mode gather|quan …`) để được chạy và chấm tự động. **Công nghệ không ràng buộc**: khung Python trong `chonoi/` chỉ là gợi ý, chi tiết ở [`docs/STARTER.md`](docs/STARTER.md).
 
+## Bản phát hành v1.0.0
+
+Yêu cầu: Python 3.10+ (chỉ dùng standard library) và trình duyệt hiện đại để chơi giao diện. Riêng benchmark cần Playwright (xem mục *Yêu cầu môi trường*).
+
+Từ macOS/Linux clone sạch, mở game trong tối đa ba lệnh:
+
+```bash
+git clone https://github.com/longpham2k2/K5-L3B-LAB-Day12-AI-SDLC-Nhom0913.git chonoi
+cd chonoi
+python3 -m chonoi.live --mode day --days 5
+```
+
+Lệnh cuối in địa chỉ local để mở trong trình duyệt. Dừng server bằng `Ctrl+C`.
+
+### Kiểm tra và công cụ phát hành
+
+```bash
+# Regression
+PYTHONPATH=tests:. python3 -m unittest discover -s tests -v
+
+# Một Ngày headless và hai công cụ contract v1.3
+python3 -m chonoi.headless --mode day --seed 1 --days 1 --ticks 40000 --out day.jsonl
+python3 -m chonoi.bench --seed 42 --duration 30 --out bench.json
+python3 -m chonoi.soak --seed 7 --days 10 --out soak.json
+```
+
+Để bật kiểm tra trước mỗi lần push trong clone của bạn:
+
+```bash
+chmod +x .githooks/pre-push && git config core.hooksPath .githooks
+```
+
 ### Điều khiển
 
 - **WASD** hoặc **phím mũi tên**: di chuyển.
@@ -42,6 +74,20 @@ Chạy trên Windows PowerShell có thể dùng `py` thay cho `python3`, và đ�
 ```powershell
 $env:PYTHONPATH="tests;."; py -m unittest discover -s tests -v
 ```
+
+### Yêu cầu môi trường
+
+- macOS hoặc Linux, **Python ≥ 3.10**, chỉ thư viện chuẩn cho game, headless, test và soak. Cửa sổ chơi mở bằng trình duyệt bất kỳ.
+- **Riêng benchmark** cần Playwright + Chromium: `python3 -m pip install playwright && python3 -m playwright install chromium`. Không cài thì test bench trình duyệt tự bỏ qua, các test khác vẫn chạy.
+
+### Benchmark và soak (Test Contract v1.3)
+
+```bash
+python3 -m chonoi.bench --seed 42 --duration 30 --out bench.json   # cảnh sáng 1280×720, nóng 3 s + đo 30 s
+python3 -m chonoi.soak  --seed 7  --days 10   --out soak.json      # 10 Ngày headless trong một tiến trình
+```
+
+Kết quả đo trên commit nộp: `docs/proof/phase-4/bench.json`, `docs/proof/phase-4/soak.json`.
 
 ### Cách tính điểm
 

@@ -23,8 +23,8 @@
   - Mọi lần đổi schema dữ liệu lõi cần khóa helper test dùng chung (`items(...)`), nhánh tích hợp riêng và chạy toàn bộ `discover -s tests` trước khi hợp nhất `p3 -> main`.
 
 ## Phase 4 (cuối)
-## Phase 4 (cuối)
-- **Rà lại hành động Phase 2** ("trước khi push phải chạy test trên bản sạch — hook `pre-push`, người nhận: Huy"): **chưa làm.** Không có hook nào trong `.git/hooks`, không có mục hook trong `AGENTS.md`. Hệ quả đo được: ở Phase 3 lại có một push thiếu `quan.py` ([`8a0fbfc`](https://github.com/longpham2k2/K5-L3B-LAB-Day12-AI-SDLC-Nhom0913/commit/8a0fbfc), chỉ có file test) làm nhánh `p3` đỏ tới khi có [`9bb69d0`](https://github.com/longpham2k2/K5-L3B-LAB-Day12-AI-SDLC-Nhom0913/commit/9bb69d0). Vì sao: mỗi phase quá ngắn, hành động không có hạn cụ thể và không ai nhắc ở standup. Điều đã giảm thiểu được: làm Phase 3 trên nhánh `p3` + chạy `tools/smoke_p3.sh` (140/140 test) trước khi gộp nên lỗi không chạm `main`.
+- **Rà lại hành động Phase 2** ("trước khi push phải chạy test trên bản sạch — hook `pre-push`, người nhận: Huy"): **chưa làm trong Phase 3** (làm muộn ở Phase 4, xem dòng kế). Không có hook nào trong `.git/hooks`, không có mục hook trong `AGENTS.md`. Hệ quả đo được: ở Phase 3 lại có một push thiếu `quan.py` ([`8a0fbfc`](https://github.com/longpham2k2/K5-L3B-LAB-Day12-AI-SDLC-Nhom0913/commit/8a0fbfc), chỉ có file test) làm nhánh `p3` đỏ tới khi có [`9bb69d0`](https://github.com/longpham2k2/K5-L3B-LAB-Day12-AI-SDLC-Nhom0913/commit/9bb69d0). Vì sao: mỗi phase quá ngắn, hành động không có hạn cụ thể và không ai nhắc ở standup. Điều đã giảm thiểu được: làm Phase 3 trên nhánh `p3` + chạy `tools/smoke_p3.sh` (140/140 test) trước khi gộp nên lỗi không chạm `main`.
+- **Khắc phục ở Phase 4:** version hóa `.githooks/pre-push`, hướng dẫn cài trong README/AGENTS và thêm kiểm `git status` trước khi đóng gói; hook chạy toàn bộ test trước khi push.
 - **Điều tốt:**
   - Chốt hợp đồng sớm ở mọi phase (`docs/contracts/README.md` §1–§6) → 3 người làm song song, tích hợp ít xung đột.
   - Test trước + review chéo bằng kịch bản thật bắt được lỗi trước tag (tên trường event P1, `base_price` đơn assigned, thiếu snapshot đổi pha P2, `test_p4_soak.py` lỗi `python3` trên Windows được sửa qua `helpers.contract_cmd`).
@@ -36,5 +36,5 @@
 - **Một lần AI sai và cách nhóm phát hiện:**
   - Ở P3 (`Long`): test ngưỡng dùng `fresh = 30 + 2/120` không biểu diễn chính xác bằng float JSON nên ươn sớm 1 tick; phát hiện vì test đỏ ở biên, xác minh bằng tay với `Fraction`, sửa thành 30.5 (`docs/clarify.md` #26).
   - Ở P4 (`Duy`): nhãn `"⚠ Sắp giận!"` ban đầu đè `T1`/nhân vật và `bench.py` thiếu timeout >30s + kiểm `window.snap`; phát hiện khi đọc ảnh chụp `hud-hc-quan-alert.png` và chạy benchmark 30s thật.
-- **Hành động tiếp theo:** cài hook `pre-push` chạy toàn bộ test (`contract_cmd` đa nền tảng) **ngay đầu buổi**, và đưa "hành động retro" thành một dòng có hạn trong plan của phase kế.
+- **Hành động tiếp theo:** cài hook `pre-push` ngay đầu mỗi clone (hook đã được version hóa), và đưa "hành động retro" thành một dòng có hạn trong plan của phase kế; trước tag/Release chạy hook, regression và kiểm package `.zip` từ worktree sạch.
 - **Nếu làm lại, đổi gì:** chia `day`/HUD cho 2 người từ đầu; luôn kiểm ảnh chụp UI sau mỗi sửa đổi, tạo tag sau khi `main` đã push và kiểm `git ls-remote` ngay.

@@ -1,0 +1,27 @@
+AC-P4-04 — kiểm thử clone sạch (Windows host, quy trình README tương đương macOS/Linux)
+
+Source commit: c610b83
+
+Ba lệnh người dùng theo README:
+  1. git clone <repo> chonoi
+  2. cd chonoi
+  3. python3 -m chonoi.live --mode gather
+
+Kiểm tra tự động trên clone tạm:
+  - `git clone --no-local --depth 1 . <temp>` thành công.
+  - Khởi động `python -m chonoi.live --mode gather --port <free-port>`.
+  - GET /state trả HTTP 200.
+  - `git status --porcelain` trong clone rỗng.
+
+Kết quả: ĐẠT. Clone tạm đã được xóa sau kiểm tra.
+
+Kiểm archive `dist/chonoi-v1.0.0.zip`:
+  - Có README.md, LICENSE, CREDITS.md, game.contract.json, chonoi/live.py và .githooks/pre-push.
+  - Giải nén tạm, chạy headless gather 1 tick tạo 3 dòng JSONL.
+  - Khởi động live gather từ archive và GET /state trả HTTP 200.
+
+Kết quả archive: ĐẠT. Thư mục giải nén tạm đã được xóa.
+
+Regression công cụ v1.3:
+  - `tests/test_p4_soak.py`: 5/5 ĐẠT (test dùng `sys.executable` khi Windows không có alias `python3`; manifest vẫn giữ lệnh contract chuẩn).
+  - `python -m chonoi.soak --seed 7 --days 10`: days_completed = 10, crashes = 0, results = 10.

@@ -1,5 +1,6 @@
 """AC-P4-02 (v1.3): benchmark có render 1280x720 (seed 42, 5 trường JSON, p1_low_fps, lỗi rõ khi thiếu trình duyệt)."""
 
+import importlib.util
 import io
 import json
 import os
@@ -51,6 +52,9 @@ class BenchMathAndErrors(unittest.TestCase):
             self.assertFalse(os.path.exists(out))
 
 
+# Bench thật cần Playwright + Chromium (không thuộc thư viện chuẩn). Máy không cài thì BỎ QUA thay vì làm đỏ main;
+# cài: python3 -m pip install playwright && python3 -m playwright install chromium (xem README, mục Benchmark).
+@unittest.skipUnless(importlib.util.find_spec("playwright"), "cần playwright: pip install playwright && playwright install chromium")
 class BenchBrowserCli(unittest.TestCase):
     def test_real_browser_bench_cli_writes_five_fields(self):
         with Workdir() as w:

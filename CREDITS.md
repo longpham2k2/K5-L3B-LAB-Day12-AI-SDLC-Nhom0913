@@ -21,3 +21,6 @@ Khung `chonoi/` (CLI, inputs, scenario, JSONL, runner, live) do giảng viên cu
 | tran85122-afk (Duy) | Antigravity · Gemini |
 
 Chi tiết từng việc và chỗ AI sai: `docs/ai-usage-log.md`.
+## Giấy phép
+
+Mã và tài liệu do nhóm 0913 tạo được phát hành theo [MIT License](LICENSE). Asset Kenney nêu trên giữ giấy phép CC0 1.0; khung starter vẫn ghi nhận nguồn VinUniversity.
