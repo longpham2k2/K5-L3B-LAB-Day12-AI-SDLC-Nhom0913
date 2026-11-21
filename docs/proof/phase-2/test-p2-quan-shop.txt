@@ -45,3 +45,19 @@ Result:
 Ran 107 tests in 43.957s
 OK
 ```
+
+## Integrated-main recheck
+
+Code commit tested: `40d45b4` (rebased status commit, atop `a94aae5` Day/Pause/HUD).
+
+```powershell
+$env:PYTHONPATH='tests;.'
+& 'C:\Program Files\Unity\Hub\Editor\6000.6.0f1\Editor\Data\PlaybackEngines\WebGLSupport\BuildTools\Emscripten\python\python.exe' -m unittest discover -s tests -v
+```
+
+Result:
+
+```
+Ran 117 tests in 59.857s
+OK
+```
