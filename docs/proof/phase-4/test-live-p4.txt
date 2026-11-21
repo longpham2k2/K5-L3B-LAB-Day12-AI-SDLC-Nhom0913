@@ -1,0 +1,11 @@
+test_day_hold_on_start_until_restart (tests.test_live.LiveServerTest.test_day_hold_on_start_until_restart) ... ok
+test_day_mode_pause_hold_and_shop_inputs (tests.test_live.LiveServerTest.test_day_mode_pause_hold_and_shop_inputs) ... ok
+test_gather_freshness_state_and_hud_markers (tests.test_live.LiveServerTest.test_gather_freshness_state_and_hud_markers) ... ok
+test_phase4_three_alerts_and_high_contrast_markers (tests.test_live.LiveServerTest.test_phase4_three_alerts_and_high_contrast_markers) ... ok
+test_quan_hud_state_and_html_fields (tests.test_live.LiveServerTest.test_quan_hud_state_and_html_fields) ... ok
+test_state_input_and_clean_stop (tests.test_live.LiveServerTest.test_state_input_and_clean_stop) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 4.016s
+
+OK

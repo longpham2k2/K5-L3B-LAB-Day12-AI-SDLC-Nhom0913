@@ -1,0 +1,10 @@
+test_root_has_version_and_commands (tests.test_p4_soak.Manifest13.test_root_has_version_and_commands) ... ok
+test_cli_writes_soak_json (tests.test_p4_soak.Soak.test_cli_writes_soak_json) ... ok
+test_day6_plan_repeats_day1 (tests.test_p4_soak.Soak.test_day6_plan_repeats_day1) ... ok
+test_deterministic_gameplay_fields (tests.test_p4_soak.Soak.test_deterministic_gameplay_fields) ... ok
+test_six_days_wraps_plan_and_completes (tests.test_p4_soak.Soak.test_six_days_wraps_plan_and_completes) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 20.080s
+
+OK

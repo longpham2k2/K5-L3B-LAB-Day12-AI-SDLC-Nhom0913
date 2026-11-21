@@ -1,7 +1,6 @@
 """AC-P4-01 (v1.3): manifest bench_cmd/soak_cmd, soak nhiều Ngày, kế hoạch D1–D5 lặp ở Ngày 6+ (TICKET-04 mục 1–2)."""
 
 import json
-import shlex
 import subprocess
 import unittest
 
@@ -10,7 +9,7 @@ from chonoi.inputs import LiveInputs
 from chonoi.runner import Session
 from chonoi.soak import soak
 
-from helpers import ROOT, Workdir
+from helpers import ROOT, Workdir, contract_cmd
 
 with open("game.contract.json", encoding="utf-8") as _f:
     C = json.load(_f)
@@ -49,14 +48,15 @@ class Soak(unittest.TestCase):
     def test_cli_writes_soak_json(self):
         with Workdir() as w:
             out = w.path("soak.json")
-            cmd = shlex.split(C["soak_cmd"]) + ["--seed", "7", "--days", "1", "--out", out]
+            soak_base = contract_cmd("soak_cmd")  # cross-platform: python3 -> sys.executable trên Windows
+            cmd = soak_base + ["--seed", "7", "--days", "1", "--out", out]
             p = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
             self.assertEqual(p.returncode, 0, p.stderr)
             with open(out, encoding="utf-8") as f:
                 r = json.load(f)
             self.assertEqual(set(r), {"days", "days_completed", "crashes", "results", "duration_s"})
             self.assertEqual((r["days_completed"], r["crashes"]), (1, 0))
-            bad = subprocess.run(shlex.split(C["soak_cmd"]) + ["--seed", "7", "--days", "0", "--out", out],
+            bad = subprocess.run(soak_base + ["--seed", "7", "--days", "0", "--out", out],
                                  cwd=ROOT, capture_output=True, text=True)
             self.assertEqual(bad.returncode, 2)
 

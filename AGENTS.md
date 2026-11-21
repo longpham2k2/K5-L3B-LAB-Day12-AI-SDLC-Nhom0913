@@ -7,7 +7,9 @@
 - Headless: `python3 -m chonoi.headless --mode gather|quan|day --seed 1 --ticks 600 --out out.jsonl` (`day` thêm `--days 1..5`)
 - Smoke Phase 2 (tích hợp, day, regression P1 → `docs/proof/phase-2/`): `bash tools/smoke_p2.sh` (thoát ≠ 0 nếu có kiểm tra không đạt)
 - Smoke Phase 3 (v1.2 kho cá thể, day 1/2/5, regression P1–P2 → `docs/proof/phase-3/`): `bash tools/smoke_p3.sh` (thoát ≠ 0 nếu có kiểm tra không đạt)
-- Chơi thử trên trình duyệt: `python3 -m chonoi.live --mode gather|quan` (mở địa chỉ in ra; WASD, E, Space, R)
+- Bench Phase 4 (render 1280×720, nóng 3s + đo 30s): `python3 -m chonoi.bench --seed 42 --duration 30 --out docs/proof/phase-4/bench.json` (mã 1 nếu thiếu trình duyệt thật)
+- Soak Phase 4 (10 Ngày headless, D1–D5 lặp ở Ngày 6+): `python3 -m chonoi.soak --seed 7 --days 10 --out docs/proof/phase-4/soak.json`
+- Chơi thử trên trình duyệt: `python3 -m chonoi.live --mode gather|quan|day` (mở địa chỉ in ra; WASD, E, Space, C tương phản cao, P/Esc tạm dừng, R chơi lại)
 
 ## Cấu trúc & quy ước
 - (Starter Python là TÙY CHỌN; nhóm có thể dùng ngôn ngữ khác nếu giữ Test Contract.) Khung do giảng viên cấp: `chonoi/{headless,inputs,scenario,contract,rng,ids,jsonl,inventory,runner,live}.py` và `chonoi/web/`. Hạn chế sửa; nếu phải sửa thì báo cả nhóm và ghi lại lý do.

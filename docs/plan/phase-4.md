@@ -5,12 +5,12 @@
 | ID | Việc | Vai | Người | Trạng thái |
 |---|---|---|---|---|
 | AC-P4-01 | `contract_version: "1.3"`, `bench_cmd` + `soak_cmd` ở gốc manifest; `soak_cmd` (`python3 -m chonoi.soak`): 10 Ngày một tiến trình, D1–D5 lặp ở Ngày 6–10, `soak.json` + test | Integrator | Long | Xong (`tests/test_p4_soak.py` 5 test; `docs/proof/phase-4/soak.json` 10/10 Ngày, 0 crash) |
-| AC-P4-02 | `bench_cmd` (`python3 -m chonoi.bench`): render cảnh sáng chuẩn 1280×720 trên trình duyệt, seed 42, nóng 3 s + đo 30 s, `bench.json` 5 trường; lưu artifact `docs/proof/phase-4/bench.json` | Bench/QA | Duy | |
-| AC-P4-03 | Ba cảnh báo có chữ/biểu tượng (thủy quái gần, oxy sắp hết, khách sắp giận) + chế độ tương phản cao; chơi thử, chụp ảnh `docs/proof/phase-4/` | Bench/QA | Duy | |
+| AC-P4-02 | `bench_cmd` (`python3 -m chonoi.bench`): render cảnh sáng chuẩn 1280×720 trên trình duyệt, seed 42, nóng 3 s + đo 30 s, `bench.json` 5 trường; lưu artifact `docs/proof/phase-4/bench.json` | Bench/QA | Duy | Xong (`chonoi/bench.py`, `tests/test_p4_bench.py` 3/3 OK, `docs/proof/phase-4/bench.json`: avg 119.95 FPS, 1% low 89.69 FPS, load 1334.9 ms) |
+| AC-P4-03 | Ba cảnh báo có chữ/biểu tượng (thủy quái gần, oxy sắp hết, khách sắp giận) + chế độ tương phản cao; chơi thử, chụp ảnh `docs/proof/phase-4/` | Bench/QA | Duy | Xong (`chonoi/web/index.html`, `tests/test_live.py` 6/6 OK, `docs/proof/phase-4/hud-hc-gather-alerts.png` & `hud-hc-quan-alert.png`) |
 | AC-P4-04 | Đóng gói: thử clone sạch (≤ 3 lệnh macOS/Linux), README (môi trường, điều khiển, test, headless, bench, soak), rà `CREDITS.md`/`LICENSE`, bản đóng gói `.zip` | Đóng gói | Huy | |
-| AC-P4-05 | Retro P4 (rà hành động P2 — hook `pre-push`), phản tư `docs/members/` đủ 3 người, standup, ai-usage-log, clarify | Điều phối retro | Huy + mọi người | |
-| AC-P4-06 | `docs/verification/phase-4.md`, regression P1–P3 | Bench/QA | Duy | |
-| AC-P4-07 | Release notes, rà `CHANGELOG.md` theo phase, tag `phase-4` + GitHub Release v1.0.0 (đính kèm .zip) cùng commit trên `main` | Release | Long | Chuẩn bị xong (`CHANGELOG.md` 4 phase, `docs/release/v1.0.0.md`, `tools/package_release.sh`); chờ `chonoi.bench` của Duy để gắn tag + Release |
+| AC-P4-05 | Retro P4 (rà hành động P2 — hook `pre-push`), phản tư `docs/members/` đủ 3 người, standup, ai-usage-log, clarify | Điều phối retro | Huy + mọi người | WIP (`longpham2k2` & `tran85122-afk` đã xong phản tư/retro/standup/ai-usage-log; chờ `HyperSyst`) |
+| AC-P4-06 | `docs/verification/phase-4.md`, regression P1–P3 | Bench/QA | Duy | Xong (`tests/helpers.py::contract_cmd`, sửa `test_p4_soak.py`, regression P1–P3 `141/141` OK, toàn suite `149/149` OK, `docs/verification/phase-4.md`) |
+| AC-P4-07 | Release notes, rà `CHANGELOG.md` theo phase, tag `phase-4` + GitHub Release v1.0.0 (đính kèm .zip) cùng commit trên `main` | Release | Long | Chuẩn bị xong (`CHANGELOG.md` 4 phase, `docs/release/v1.0.0.md`, `tools/package_release.sh`); chờ Huy đóng gói `AC-P4-04` rồi gắn tag + Release |
 
 **Mốc:** phút 0–15 song song 01–04 · phút 15–25 retro, phản tư, verification · phút 25–30 kiểm commit/artifact → tag + Release (Long).
 
