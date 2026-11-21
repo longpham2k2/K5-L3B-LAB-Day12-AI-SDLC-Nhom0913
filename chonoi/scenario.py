@@ -188,7 +188,7 @@ def _validate_quan(b, tuning):
         if state == "waiting":
             dish_id = c.get("dish_id")
             reserved = c.get("reserved")
-            if dish_id is not None:
+            if order_status == "reserved" and dish_id is not None:
                 recipe = tuning["menu"][dish_id]["recipe"]
                 if reserved is not None and reserved != recipe:
                     raise BadInput(f"customers.{c['id']}: giữ khác công thức món")

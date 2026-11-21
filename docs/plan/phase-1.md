@@ -9,7 +9,7 @@
 | AC-P1-01 | Lát 1: bơi, oxy, ngạt, Máu, ngất (giỏ LIFO), dive/surface | Long | — | Xong (`tests/test_gather_slice1.py`) |
 | AC-P1-02 | Lát 2: hái nút ở mặt nước, nút mọc lại, bắt cá (`catch`, hồi chiêu), `hold_full`, cập bến, ghi file kho | Long | AC-P1-01 | Xong (`tests/test_gather_slice2.py`, smoke 2 tiến trình) |
 | AC-P1-03 | Lát 3: khách đến theo lịch, chọn món nấu được, giữ chỗ nguyên liệu, kiên nhẫn, `customer_left`, `no_dish` | Huy | Hợp đồng kho (AC-P1-07) | Xong (`tests/test_quan_slice3.py`: khách đến/giữ chỗ, hết món, hết kiên nhẫn) |
-| AC-P1-04 | Lát 4: bếp (`cook_started`, `dish_ready`), bưng (`dish_picked`), phục vụ (`served`), ăn, trả tiền (`paid`), boa, uy tín, `quan_end` | Duy | AC-P1-03 (trường khách/đơn) | Chưa bắt đầu |
+| AC-P1-04 | Lát 4: bếp (`cook_started`, `dish_ready`), bưng (`dish_picked`), phục vụ (`served`), ăn, trả tiền (`paid`), boa, uy tín, `quan_end` | Duy | AC-P1-03 (trường khách/đơn) | Xong (`tests/test_quan_slice4.py`) |
 | AC-P1-05 | HUD: buổi sáng (thời gian, oxy, Máu, giỏ); buổi tối (kho khả dụng, món gọi, kiên nhẫn, bếp, món trên tay, tiền, uy tín) | Duy | AC-P1-02, AC-P1-04 | Chưa bắt đầu |
 | AC-P1-06 | Ma trận truy vết `docs/verification/phase-1.md` + bằng chứng `docs/proof/phase-1/` | Duy | Tất cả | Chưa bắt đầu |
 | AC-P1-07 | Hợp đồng kho `docs/contracts/` (schema + ví dụ), danh sách sự kiện, giao diện sim ↔ UI | Long | — | Xong (`docs/contracts/README.md`) |

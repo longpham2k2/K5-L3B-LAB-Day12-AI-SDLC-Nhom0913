@@ -7,6 +7,7 @@
 | 1 | longpham2k2 | Claude Code · Claude Opus 5.5 | Lát 1 gather (oxy, ngạt, Máu, ngất, dive/surface): viết test trước (`tests/test_gather_slice1.py`, 9 test) rồi code trong `chonoi/sim/gather.py` | (gộp ở trên) | Test viết trước, chạy đỏ rồi mới code; mỗi test trích câu PRD mục F bước 2. Người đọc lại diff trước khi commit. Không thấy lỗi luật. |
 | 1 | longpham2k2 | Claude Code · Claude Opus 5.5 | Chép PRD-0 vào `docs/prd/phase-1.md`; chốt hợp đồng kho/sự kiện/giao diện UI (`docs/contracts/README.md`) | (gộp ở trên) | AI định dạng lại bảng/markdown; người kiểm nội dung khớp bản trên lab board. |
 | 1 | longpham2k2 | Claude Code · Claude Opus 5.5 | Lát 2 gather (hái, bắt cá, `hold_full`, hồi bắt, bước cuối): 13 test trước (`tests/test_gather_slice2.py`) rồi code; chạy smoke hai tiến trình mục G | (gộp ở trên) | 9/13 test đỏ trước khi code (4 test "không có sự kiện" vốn đã xanh). Sau khi code: 54/54 test OK, smoke đúng `{"bong_sung":2,"ca_loc":1}` (`docs/proof/phase-1/`). |
+| 1 | tran85122-afk | Antigravity · Gemini | Lát 4 quan (`cook_started`, `dish_ready`, `dish_picked`, `served`, `paid`, boa, uy tín `Decimal`, đóng ca, kiểm scenario mức luật): viết 15 test trước (`tests/test_quan_slice4.py`) rồi cài đặt trong `chonoi/sim/quan.py`; thêm fallback `python3` trong `tests/helpers.py` cho Windows | — | Lần chạy test đỏ đầu tiên phát hiện 1 frame trùng tick trong test tích hợp của chính test; sửa frame rồi viết sim xong đạt 15/15 test Lát 4 và toàn bộ bộ test xanh. |
 
 ## Cách nhóm dùng AI (thống nhất)
 

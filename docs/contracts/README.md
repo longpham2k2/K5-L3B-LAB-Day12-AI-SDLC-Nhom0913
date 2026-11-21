@@ -37,11 +37,11 @@ Nguồn: PRD-0 mục D, E, G (`docs/prd/phase-1.md`). Đổi hợp đồng: báo
 | `gather_end` | `reason (time/docked/fainted), inventory` | gather | xong |
 | `customer_arrived` / `no_dish` | `order_id, table_id, dish_id` / `{}` | quan (lát 3 — Huy) | xong |
 | `customer_left` | `order_id, table_id, reason (patience/closing), reputation` | quan (lát 3 — Huy) | xong |
-| `cook_started` | `stove_id, order_id, dish_id, items, base_price` | quan (lát 4 — Duy) | |
-| `dish_ready` / `dish_picked` | `stove_id, order_id, dish_id` | quan (lát 4 — Duy) | |
-| `served` | `order_id, table_id, dish_id, patience_ticks_left, base_price, tip` | quan (lát 4 — Duy) | |
-| `paid` | `order_id, table_id, base_price, tip, amount, reason (finished_eating/closing)` | quan (lát 4 — Duy) | |
-| `quan_end` | `reason: "time", money, earned, shift_earned, reputation` | quan (lát 4 — Duy) | |
+| `cook_started` | `stove_id, order_id, dish_id, items, base_price` | quan (lát 4 — Duy) | xong |
+| `dish_ready` / `dish_picked` | `stove_id, order_id, dish_id` | quan (lát 4 — Duy) | xong |
+| `served` | `order_id, table_id, dish_id, patience_ticks_left, base_price, tip` | quan (lát 4 — Duy) | xong |
+| `paid` | `order_id, table_id, base_price, tip, amount, reason (finished_eating/closing)` | quan (lát 4 — Duy) | xong |
+| `quan_end` | `reason: "time", money, earned, shift_earned, reputation` | quan (lát 4 — Duy) | xong |
 
 ## 4. Ranh giới lát 3 ↔ lát 4 trong `chonoi/sim/quan.py`
 
