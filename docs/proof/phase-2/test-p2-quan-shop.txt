@@ -1,0 +1,29 @@
+# Runtime verification — AC-P2-04 / AC-P2-05
+
+Runtime: Python 3.13.3 (Unity WebGL toolchain)
+
+```powershell
+$env:PYTHONPATH='tests;.'
+& 'C:\Program Files\Unity\Hub\Editor\6000.6.0f1\Editor\Data\PlaybackEngines\WebGLSupport\BuildTools\Emscripten\python\python.exe' -m unittest tests.test_p2_quan_shop -v
+```
+
+Result:
+
+```
+Ran 6 tests in 0.004s
+OK
+```
+
+Regression:
+
+```powershell
+$env:PYTHONPATH='tests;.'
+& 'C:\Program Files\Unity\Hub\Editor\6000.6.0f1\Editor\Data\PlaybackEngines\WebGLSupport\BuildTools\Emscripten\python\python.exe' -m unittest discover -s tests -v
+```
+
+Result:
+
+```
+Ran 107 tests in 40.314s
+OK
+```
