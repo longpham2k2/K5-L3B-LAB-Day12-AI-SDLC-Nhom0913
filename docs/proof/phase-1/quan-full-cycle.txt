@@ -1,0 +1,15 @@
+# Quán: một vòng nấu → bưng → phục vụ → trả tiền — 2026-11-21T03:15:12Z, commit acb8f9e
+# Mục tiêu: khớp dòng end ví dụ trong PRD-0 mục E (money 72, reputation 3.2, score 372)
+--- scenario.json
+{"quan":{"player":{"pos":[2,8]},"stock":{"ca_loc":1},"random_customers":false,"tables":[{"id":"T1","pos":[2,5.5]}],"customers":[{"id":"C1","table_id":"T1","dish_id":"ca_loc_nuong_trui"}]}}
+--- inputs.json
+{"frames":[{"tick":0,"interact":true},{"tick":1,"interact":false},{"tick":361,"interact":true},{"tick":362,"interact":false,"move":[0,-1]},{"tick":392,"move":[0,0]},{"tick":400,"interact":true},{"tick":401,"interact":false}]}
+$ python3 -m chonoi.headless --mode quan --seed 1 --scenario scenario.json --inputs inputs.json --ticks 20000 --snapshot-every 100000 --out q.jsonl
+exit=0
+{"type":"event","tick":1,"phase":"quan","name":"cook_started","data":{"stove_id":"B1","order_id":"C1","dish_id":"ca_loc_nuong_trui","items":["ca_loc"],"base_price":60}}
+{"type":"event","tick":361,"phase":"quan","name":"dish_ready","data":{"stove_id":"B1","order_id":"C1","dish_id":"ca_loc_nuong_trui"}}
+{"type":"event","tick":362,"phase":"quan","name":"dish_picked","data":{"stove_id":"B1","order_id":"C1","dish_id":"ca_loc_nuong_trui"}}
+{"type":"event","tick":401,"phase":"quan","name":"served","data":{"order_id":"C1","table_id":"T1","dish_id":"ca_loc_nuong_trui","patience_ticks_left":3199,"base_price":60,"tip":12}}
+{"type":"event","tick":1001,"phase":"quan","name":"paid","data":{"order_id":"C1","table_id":"T1","base_price":60,"tip":12,"amount":72,"reason":"finished_eating"}}
+{"type":"event","tick":10800,"phase":"quan","name":"quan_end","data":{"reason":"time","money":72,"earned":72,"shift_earned":72,"reputation":3.2}}
+{"type":"end","ticks":10800,"sim_tick":10800,"mode":"quan","state":"finished","reason":"time","money":72,"earned":72,"reputation":3.2,"score":372}
