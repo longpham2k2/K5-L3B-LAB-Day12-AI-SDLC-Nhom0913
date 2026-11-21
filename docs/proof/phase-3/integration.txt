@@ -1,4 +1,4 @@
-# Smoke bàn giao kho cá thể v1.2 (TICKET-03 mục 1) — 2026-11-21T05:19:58Z, commit 9bb69d0+dirty
+# Smoke bàn giao kho cá thể v1.2 (TICKET-03 mục 1) — 2026-11-21T05:24:56Z, commit 871c67a
 --- dock.json
 {"gather":{"hold":[{"id":"I1","kind":"ca_linh","fresh":100}],"random_fish":false,"monsters":[]}}
 $ /c/Users/Admin/AppData/Local/Programs/Python/Python312/python -m chonoi.headless --mode gather --seed 42 --scenario dock.json --inputs dock-inputs.json --ticks 1 --out gather.jsonl --inventory-out catch.json

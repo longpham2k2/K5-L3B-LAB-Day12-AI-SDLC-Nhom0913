@@ -1,6 +1,6 @@
 # Ma trận truy vết Phase 3 (TICKET-03 — Test Contract v1.2)
 
-> Kiểm chứng trên nhánh tích hợp `p3` (tích hợp `AC-P3-01..06` trên nền `9bb69d0`): **140/140** test xanh trong `all-tests.txt`, **125/125** test P1–P2 còn hiệu lực đạt trong `regression-p1-p2.txt`, **11/11** kiểm tra smoke Phase 3 (`4/4` bàn giao file + `7/7` `--mode day`), và kiểm thử trực quan HUD độ tươi/ươn trên trình duyệt `1280×720`. (Nhóm 3 người: không làm phần mở rộng không bắt buộc; phần gộp `p3 → main` và gắn tag `phase-3` thực hiện sau khi đẩy nhánh `p3`.)
+> Kiểm chứng trên nhánh tích hợp `p3` (commit `871c67a`): **140/140** test xanh trong `all-tests.txt`, **125/125** test P1–P2 còn hiệu lực đạt trong `regression-p1-p2.txt`, **11/11** kiểm tra smoke Phase 3 (`4/4` bàn giao file + `7/7` `--mode day`), và kiểm thử trực quan HUD độ tươi/ươn trên trình duyệt `1280×720`. (Nhóm 3 người: không làm phần mở rộng không bắt buộc; phần gộp `p3 → main` và gắn tag `phase-3` thực hiện sau khi đẩy nhánh `p3`.)
 
 | AC | Cách kiểm chứng | Bằng chứng (link `docs/proof/phase-3/...`) | Kết quả (đạt / chưa đạt — ghi trung thực) |
 |---|---|---|---|

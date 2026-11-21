@@ -1,8 +1,8 @@
-# Smoke --mode day v1.2 (TICKET-03) — 2026-11-21T05:19:58Z, commit 9bb69d0+dirty
+# Smoke --mode day v1.2 (TICKET-03) — 2026-11-21T05:24:56Z, commit 871c67a
 
 ## 2a. day --days 1, không điều khiển: một Ngày tối đa 22.200 tick, chạy <= 20 s
 exit=0
-thời gian chạy: 1.51 s
+thời gian chạy: 1.44 s
 {"type":"end","ticks":22200,"sim_tick":22200,"mode":"day","state":"finished","reason":"days_complete","money":0,"earned":0,"reputation":3.0,"score":300,"days_completed":1}
 ĐẠT  một Ngày = 22.200 tick, days_complete
 ĐẠT  thứ tự đổi pha
