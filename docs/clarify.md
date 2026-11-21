@@ -27,5 +27,7 @@
 | 23 | 2026-11-21 (P2) | Bước Cá Sấu vừa hết recoil có được chạm không? | **Giả định:** không — "xét phát hiện/chạm từ bước kế"; bước đó chỉ di chuyển lùi lần cuối rồi về patrol. | Long |
 | 24 | 2026-11-21 (P2) | Chase/patrol đổi trạng thái trước hay sau khi di chuyển trong cùng bước? | **Giả định:** xét chuyển trạng thái theo vị trí người chơi sau khi bơi, rồi di chuyển theo trạng thái mới ngay bước đó. | Long |
 | 25 | 2026-11-21 (P2) | Fixture `--mode day`: `gather.hold` (và `player.oxygen_ticks`/`hp`/`zero_oxy_ticks`) áp cho Ngày nào? | **Giả định:** chỉ áp cho Ngày 1; từ Ngày 2 giỏ rỗng, oxy/Máu đầy theo cấp `active_upgrades` (runner `_gather_scenario_for_day`). Test: `test_day_two_days_upgrades_active_next_day_and_hold_reset`. | Duy |
+| 26 | 2026-11-21 (P3) | Fixture `fresh` là số thực JSON (vd. 30 + 2/120 không biểu diễn chính xác) — so ngưỡng thế nào? | **Quyết định:** đổi `fresh` của file/fixture sang `Fraction` theo đúng giá trị thập phân đã ghi, hao chính xác 1/120 (giỏ) và 1/240 (quán) mỗi tick; test dùng giá trị biểu diễn chính xác (vd. 30.5 → đúng 30.0 sau 60 bước, ươn ở bước 61) như PRD gợi ý. | Long |
+| 27 | 2026-11-21 (P3) | Phase 3 không làm mở rộng (dòng lũ, khách đặt trước)? | **Quyết định:** không làm — nhóm 3 người không bắt buộc; dồn sức cho kho cá thể và độ tươi. | Long (PO) |
 
 > **Cách làm khi chưa hỏi được Anh Năm:** làm trước phần PRD đã rõ; chỗ mơ hồ cài theo giả định trên, viết test ghi rõ "giả định #n", để dễ sửa khi có câu trả lời. Có trả lời thì cập nhật cột "Trả lời / giả định" và ghi giờ.

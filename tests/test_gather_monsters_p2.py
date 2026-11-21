@@ -10,7 +10,7 @@ from chonoi.ids import IdAllocator
 from chonoi.rng import Streams
 from chonoi.sim.gather import GatherSim
 
-from helpers import Workdir, events, read_jsonl, run_headless, snapshots, write_json
+from helpers import Workdir, events, items, read_jsonl, run_headless, snapshots, write_json
 
 TUNING = load_contract()["tuning"]
 G = TUNING["gather"]
@@ -43,6 +43,11 @@ def croc(mid="M1", pos=(60, 24), wps=((60, 24), (64, 24)), **kw):
 
 def sim(day=1, upgrades=None, scenario=None):
     return GatherSim(TUNING, scenario or {}, Streams(1), IdAllocator(), day=day, active_upgrades=upgrades)
+
+
+def kinds(xs):
+    """v1.2 (TICKET-03): kho/giỏ là cá thể {id,kind,fresh} -> so theo loại."""
+    return [x["kind"] for x in xs]
 
 
 class Layout(unittest.TestCase):
@@ -111,7 +116,7 @@ class Movement(unittest.TestCase):
 
 class Hit(unittest.TestCase):
     def test_hit_loses_hp_drops_half_lifo_and_sets_invuln_and_recoil(self):
-        hold = ["ca_loc", "bong_sung", "ca_linh", "keo_neo", "ca_keo"]
+        hold = items("ca_loc", "bong_sung", "ca_linh", "keo_neo", "ca_keo")
         with Workdir() as w:
             rows = run(w, {"player": {"pos": [61, 24]}, "hold": hold}, 62)
             hit = events(rows, "monster_hit")
@@ -120,10 +125,11 @@ class Hit(unittest.TestCase):
             d = hit[0]["data"]
             self.assertEqual(d["monster_id"], "M1")
             self.assertEqual(d["hp"], G["hp_max"] - 1)
-            self.assertEqual(d["lost"], ["ca_keo", "keo_neo"], "floor(5/2) = 2, nhặt sau mất trước")
+            self.assertEqual([x["id"] for x in d["lost"]], ["I5", "I4"], "floor(5/2) = 2, nhặt sau mất trước")
+            self.assertEqual(kinds(d["lost"]), ["ca_keo", "keo_neo"])
             self.assertEqual(d["pos"], [61, 24])
             s1 = snap(rows, 1)
-            self.assertEqual(s1["hold"], hold[:3])
+            self.assertEqual([x["id"] for x in s1["hold"]], ["I1", "I2", "I3"])
             self.assertEqual(s1["player"]["invuln_ticks"], MON["invuln_ticks"])
             m = mon(rows, 1)
             self.assertEqual((m["state"], m["state_ticks_left"]), ("recoil", SP["recoil_ticks"]))
@@ -149,12 +155,13 @@ class Hit(unittest.TestCase):
 
     def test_faint_by_monster(self):
         with Workdir() as w:
-            rows = run(w, {"player": {"pos": [61, 24], "hp": 1}, "hold": ["ca_loc", "bong_sung", "ca_linh"]}, 5)
+            rows = run(w, {"player": {"pos": [61, 24], "hp": 1}, "hold": items("ca_loc", "bong_sung", "ca_linh")}, 5)
             ev = events(rows)
             self.assertEqual([e["name"] for e in ev], ["monster_hit", "faint", "gather_end"])
-            self.assertEqual(ev[0]["data"]["lost"], ["ca_linh"])
-            self.assertEqual(ev[1]["data"], {"cause": "monster", "lost": ["bong_sung", "ca_loc"], "hp": 0})
-            self.assertEqual(ev[2]["data"], {"reason": "fainted", "inventory": {"items": {}}})
+            self.assertEqual(kinds(ev[0]["data"]["lost"]), ["ca_linh"])
+            f = ev[1]["data"]
+            self.assertEqual((f["cause"], f["hp"], [x["id"] for x in f["lost"]]), ("monster", 0, ["I2", "I1"]))
+            self.assertEqual(ev[2]["data"], {"reason": "fainted", "inventory": {"items": []}})
 
 
 if __name__ == "__main__":

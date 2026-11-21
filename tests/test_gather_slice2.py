@@ -4,7 +4,7 @@ Hộp đen qua headless_cmd; theo PRD-0 mục F (Gather, bước 1, 3, 4, 5) —
 import json
 import unittest
 
-from helpers import Workdir, events, frames, read_jsonl, run_headless, snapshots, write_json
+from helpers import Workdir, events, frames, items, read_jsonl, run_headless, snapshots, write_json
 
 with open("game.contract.json", encoding="utf-8") as _f:
     G = json.load(_f)["tuning"]["gather"]
@@ -43,18 +43,24 @@ def fish(i, kind, x, d):
     return {"id": i, "kind": kind, "pos": [x, d]}
 
 
+def kinds(xs):
+    """v1.2 (TICKET-03): kho/giỏ là cá thể {id,kind,fresh} -> so theo loại."""
+    return [x["kind"] for x in xs]
+
+
 class Gather(unittest.TestCase):
     def test_pick_at_exact_radius_edge(self):
         """Ví dụ mục D: nút đúng mép bán kính hái (2.0 m) vẫn hái được."""
         with Workdir() as w:
-            rows = run(w, {"player": {"pos": [20, 0]}, "hold": ["ca_loc", "bong_sung"],
+            rows = run(w, {"player": {"pos": [20, 0]}, "hold": items("ca_loc", "bong_sung"),
                            "nodes": [node("N1", "bong_dien_dien", 22)], "fish": []}, 3, press("interact"))
             ev = events(rows, "gather")
             self.assertEqual(len(ev), 1)
             self.assertEqual(ev[0]["tick"], 1)
             self.assertEqual(ev[0]["data"], {"node_id": "N1", "kind": "bong_dien_dien", "amount": 1})
             s = snap(rows, 1)
-            self.assertEqual(s["hold"], ["ca_loc", "bong_sung", "bong_dien_dien"])
+            self.assertEqual(kinds(s["hold"]), ["ca_loc", "bong_sung", "bong_dien_dien"])
+            self.assertEqual(s["hold"][2]["id"], "I3", "id mới nối sau id đã nạp")
             self.assertEqual(s["nodes"][0]["regrow_ticks"], REGROW)
             self.assertFalse(s["nodes"][0]["ready"])
 
@@ -83,7 +89,7 @@ class Gather(unittest.TestCase):
 
     def test_hold_full_keeps_node(self):
         with Workdir() as w:
-            rows = run(w, {"player": {"pos": [20, 0]}, "hold": ["ca_loc"] * CAP,
+            rows = run(w, {"player": {"pos": [20, 0]}, "hold": items(*["ca_loc"] * CAP),
                            "nodes": [node("N1", "bong_sung", 21)]}, 2, press("interact"))
             self.assertEqual([e["name"] for e in events(rows)], ["hold_full"])
             self.assertEqual(events(rows)[0]["data"],
@@ -110,7 +116,7 @@ class Catch(unittest.TestCase):
             self.assertEqual([(e["tick"], e["data"]) for e in ev],
                              [(1, {"fish_id": "F1", "kind": "ca_linh", "yield": G["fish_yield"]["ca_linh"]})])
             s = snap(rows, 1)
-            self.assertEqual(s["hold"], ["ca_linh"] * G["fish_yield"]["ca_linh"])
+            self.assertEqual(kinds(s["hold"]), ["ca_linh"] * G["fish_yield"]["ca_linh"])
             self.assertEqual([f["id"] for f in s["fish"]], ["F2"], "đàn bị bắt bị xóa")
             self.assertEqual(s["player"]["catch_cd_ticks"], CATCH_CD)
 
@@ -134,7 +140,7 @@ class Catch(unittest.TestCase):
 
     def test_hold_full_keeps_school_no_cooldown_no_other_school(self):
         with Workdir() as w:
-            rows = run(w, {"player": {"pos": [30, 10]}, "hold": ["bong_sung"] * (CAP - 2),
+            rows = run(w, {"player": {"pos": [30, 10]}, "hold": items(*["bong_sung"] * (CAP - 2)),
                            "fish": [fish("F1", "ca_linh", 31, 10), fish("F2", "ca_loc", 31.5, 10)]}, 2, press("catch"))
             self.assertEqual([e["name"] for e in events(rows)], ["hold_full"])
             self.assertEqual(events(rows)[0]["data"], {"action": "catch", "fish_id": "F1",
@@ -160,9 +166,10 @@ class LastStep(unittest.TestCase):
                        5, press("interact"), inv_out=inv)
             self.assertEqual([e["name"] for e in events(rows)], ["gather", "gather_end"])
             self.assertEqual(events(rows, "gather_end")[0]["data"],
-                             {"reason": "time", "inventory": {"items": {"bong_sung": 1}}})
+                             {"reason": "time", "inventory": {"items": [{"id": "I1", "kind": "bong_sung", "fresh": 100}]}})
             with open(inv, encoding="utf-8") as f:
-                self.assertEqual(json.load(f), {"items": {"bong_sung": 1}})
+                self.assertEqual(json.load(f), {"items": [{"id": "I1", "kind": "bong_sung", "fresh": 100}]},
+                                 "hái ở bước cuối: fresh 100, chưa hao")
 
     def test_dock_edge_on_last_step_is_docked(self):
         with Workdir() as w:

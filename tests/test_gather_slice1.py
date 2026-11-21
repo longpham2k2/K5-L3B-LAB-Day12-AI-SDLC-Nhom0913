@@ -4,7 +4,7 @@ Hộp đen qua headless_cmd; mỗi test trích đúng câu trong PRD-0 mục F (
 import json
 import unittest
 
-from helpers import Workdir, events, frames, read_jsonl, run_headless, snapshots, write_json
+from helpers import Workdir, events, frames, items, read_jsonl, run_headless, snapshots, write_json
 
 
 def tuning_gather():
@@ -31,6 +31,11 @@ def run(w, block, ticks, inp=None, every=1, inv_out=None):
 
 def snap_at(rows, tick):
     return {r["tick"]: r for r in snapshots(rows)}[tick]
+
+
+def kinds(xs):
+    """v1.2 (TICKET-03): kho/giỏ là cá thể {id,kind,fresh} -> so theo loại."""
+    return [x["kind"] for x in xs]
 
 
 class Oxygen(unittest.TestCase):
@@ -92,21 +97,23 @@ class Faint(unittest.TestCase):
         with Workdir() as w:
             inv = w.path("inv.json")
             block = {"player": {"pos": [50, 10], "oxygen_ticks": 0, "zero_oxy_ticks": 59, "hp": 1},
-                     "hold": ["ca_loc", "bong_sung", "ca_linh"], "random_fish": False}
+                     "hold": items("ca_loc", "bong_sung", "ca_linh"), "random_fish": False}
             rows = run(w, block, 100, inv_out=inv)
             names = [e["name"] for e in events(rows)]
             self.assertEqual(names, ["choke", "faint", "gather_end"])
             ev = {e["name"]: e for e in events(rows)}
             self.assertEqual(ev["choke"]["data"], {"hp": 0})
-            self.assertEqual(ev["faint"]["data"], {"cause": "choke", "lost": ["ca_linh", "bong_sung", "ca_loc"], "hp": 0})
-            self.assertEqual(ev["gather_end"]["data"], {"reason": "fainted", "inventory": {"items": {}}})
+            f = ev["faint"]["data"]
+            self.assertEqual((f["cause"], f["hp"], kinds(f["lost"])), ("choke", 0, ["ca_linh", "bong_sung", "ca_loc"]))
+            self.assertEqual([x["id"] for x in f["lost"]], ["I3", "I2", "I1"], "LIFO theo thứ tự vào giỏ")
+            self.assertEqual(ev["gather_end"]["data"], {"reason": "fainted", "inventory": {"items": []}})
             self.assertTrue(all(e["tick"] == 1 for e in events(rows)))
             self.assertEqual(rows[-1]["reason"], "fainted")
             last = snapshots(rows)[-1]
             self.assertEqual(last["hold"], [])
             self.assertEqual(last["state"], "finished")
             with open(inv, encoding="utf-8") as f:
-                self.assertEqual(json.load(f), {"items": {}})
+                self.assertEqual(json.load(f), {"items": []})
 
 
 class DiveSurface(unittest.TestCase):
