@@ -26,5 +26,6 @@
 | 22 | 2026-11-21 (P2) | Ngưỡng "người chơi ở d ≥ 10" cho phát hiện/chạm: số cố định hay theo loài? | **Giả định:** lấy cận dưới `depths` của loài (Cá Sấu 10; Rắn ở mở rộng là 8 — khớp câu "ngưỡng độ sâu của loài"). | Long |
 | 23 | 2026-11-21 (P2) | Bước Cá Sấu vừa hết recoil có được chạm không? | **Giả định:** không — "xét phát hiện/chạm từ bước kế"; bước đó chỉ di chuyển lùi lần cuối rồi về patrol. | Long |
 | 24 | 2026-11-21 (P2) | Chase/patrol đổi trạng thái trước hay sau khi di chuyển trong cùng bước? | **Giả định:** xét chuyển trạng thái theo vị trí người chơi sau khi bơi, rồi di chuyển theo trạng thái mới ngay bước đó. | Long |
+| 25 | 2026-11-21 (P2) | Fixture `--mode day`: `gather.hold` (và `player.oxygen_ticks`/`hp`/`zero_oxy_ticks`) áp cho Ngày nào? | **Giả định:** chỉ áp cho Ngày 1; từ Ngày 2 giỏ rỗng, oxy/Máu đầy theo cấp `active_upgrades` (runner `_gather_scenario_for_day`). Test: `test_day_two_days_upgrades_active_next_day_and_hold_reset`. | Duy |
 
 > **Cách làm khi chưa hỏi được Anh Năm:** làm trước phần PRD đã rõ; chỗ mơ hồ cài theo giả định trên, viết test ghi rõ "giả định #n", để dễ sửa khi có câu trả lời. Có trả lời thì cập nhật cột "Trả lời / giả định" và ghi giờ.

@@ -44,29 +44,14 @@ def _build_plans(tuning, day_sc):
     return plans
 
 
-def _effective_gather_tuning(tuning, active_upgrades):
-    if not active_upgrades:
-        return tuning
-    eff = dict(tuning)
-    g = dict(tuning["gather"])
-    shop_ups = tuning["shop"]["upgrades"]
-    if active_upgrades.get("oxygen", 0) > 0:
-        g["oxygen_max_s"] = shop_ups["oxygen"][active_upgrades["oxygen"] - 1]["oxygen_max_s"]
-    if active_upgrades.get("hp", 0) > 0:
-        g["hp_max"] = shop_ups["hp"][active_upgrades["hp"] - 1]["hp_max"]
-    eff["gather"] = g
-    return eff
-
-
 def _build_gather(cls, tuning, g_sc, streams, ids, *, day=None, active_upgrades=None):
     params = inspect.signature(cls.__init__).parameters
-    eff_tuning = _effective_gather_tuning(tuning, active_upgrades)
     kwargs = {}
     if "day" in params and day is not None:
         kwargs["day"] = day
     if "active_upgrades" in params and active_upgrades is not None:
         kwargs["active_upgrades"] = dict(active_upgrades)
-    return cls(eff_tuning, g_sc, streams, ids, **kwargs)
+    return cls(tuning, g_sc, streams, ids, **kwargs)
 
 
 def _build_quan(cls, tuning, q_sc, streams, ids, inventory, *, plan_dishes=None, carry=None):
@@ -325,10 +310,12 @@ def run(mode, tuning, scenario, seed, frames, ticks, out_path, snapshot_every,
         w.write(sess.snapshot())  # tick 0: sau khi dựng scenario, trước mọi input
         last_snapped = 0
         while sess.tick < ticks and not sess.done:
+            phase_before = sess.sim.phase
             inp = player.advance(sess.tick)  # bước k đọc input có tick == k
             for row in sess.step(inp):
                 w.write(row)
-            if sess.tick % snapshot_every == 0 or sess.done:
+            # PRD: snapshot đổi pha ghi pha mới với phase_tick:0; tối đa 1 snapshot/tick
+            if sess.tick % snapshot_every == 0 or sess.done or sess.sim.phase != phase_before:
                 w.write(sess.snapshot())
                 last_snapped = sess.tick
         if last_snapped != sess.tick:

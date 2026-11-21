@@ -1,4 +1,4 @@
-# 2026-11-21T04:19:08Z base 288f3bf
+# 2026-11-21T04:25:57Z base a94aae5
 $ PYTHONPATH=tests:. python -m unittest tests.test_day_and_pause -v
 test_day_scenario_validation_rules (tests.test_day_and_pause.DayCliAndScenarioValidation.test_day_scenario_validation_rules) ... ok
 test_days_flag_and_inventory_flags_exit_2 (tests.test_day_and_pause.DayCliAndScenarioValidation.test_days_flag_and_inventory_flags_exit_2) ... ok
@@ -6,11 +6,12 @@ test_active_upgrades_stays_empty_during_same_day_shop (tests.test_day_and_pause.
 test_day_deterministic_bytes_real_sims (tests.test_day_and_pause.DayFlowTests.test_day_deterministic_bytes_real_sims)
 Chạy --mode day trên GatherSim/QuanSim thật tới bước giữa gather phải tất định từng byte. ... ok
 test_day_two_days_upgrades_active_next_day_and_hold_reset (tests.test_day_and_pause.DayFlowTests.test_day_two_days_upgrades_active_next_day_and_hold_reset) ... ok
+test_phase_change_writes_snapshot_with_phase_tick_zero (tests.test_day_and_pause.DayFlowTests.test_phase_change_writes_snapshot_with_phase_tick_zero) ... ok
 test_pause_freezes_gather_and_unpause_runs_same_tick (tests.test_day_and_pause.PauseTests.test_pause_freezes_gather_and_unpause_runs_same_tick) ... ok
 test_pause_ignores_buy_in_shop (tests.test_day_and_pause.PauseTests.test_pause_ignores_buy_in_shop) ... ok
 test_pause_in_quan_and_tick_limit_while_paused (tests.test_day_and_pause.PauseTests.test_pause_in_quan_and_tick_limit_while_paused) ... ok
 
 ----------------------------------------------------------------------
-Ran 8 tests in 3.243s
+Ran 9 tests in 2.361s
 
 OK

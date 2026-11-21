@@ -340,6 +340,30 @@ class DayFlowTests(unittest.TestCase):
             with open(w.path("d1.jsonl"), "rb") as a, open(w.path("d2.jsonl"), "rb") as b:
                 self.assertEqual(a.read(), b.read())
 
+    def test_phase_change_writes_snapshot_with_phase_tick_zero(self):
+        with Workdir() as w:
+            sc = {"day": {}, "quan": {"time_left_ticks": 2}}
+            fr = frames(
+                {"tick": 0, "interact": True},                 # step 0 -> tick 1: gather -> quan
+                {"tick": 1, "interact": False},                # step 1 -> tick 2: quan tick 1 (kỳ vọng không ghi snapshot)
+                {"tick": 3, "shop_done": True},                # step 2 -> tick 3: quan -> shop; step 3 -> tick 4: shop -> gather(Ngày 2)
+                {"tick": 4, "shop_done": False},               # step 4 -> tick 5: gather Ngày 2 tick 1 (không ghi snapshot)
+                {"tick": 5, "interact": True},                 # step 5 -> tick 6: gather -> quan (Ngày 2)
+                {"tick": 6, "interact": False},                # step 6 -> tick 7: quan tick 1 (không ghi snapshot)
+                {"tick": 8, "shop_done": True},                # step 7 -> tick 8: quan -> shop; step 8 -> tick 9: days_complete
+            )["frames"]
+            run("day", TUNING, sc, 1, fr, 15, w.path("d.jsonl"), 1000, days=2, sim_factories=FACTORIES)
+            snaps = snapshots(read_jsonl(w.path("d.jsonl")))
+            snap_ticks = [r["tick"] for r in snaps]
+            self.assertEqual(len(snap_ticks), len(set(snap_ticks)), "mỗi tick tối đa 1 snapshot")
+            self.assertEqual(snap_ticks, [0, 1, 3, 4, 6, 8, 9])
+            s = {r["tick"]: r for r in snaps}
+            self.assertEqual((s[1]["day"], s[1]["phase"], s[1]["phase_tick"]), (1, "quan", 0))
+            self.assertEqual((s[3]["day"], s[3]["phase"], s[3]["phase_tick"]), (1, "shop", 0))
+            self.assertEqual((s[4]["day"], s[4]["phase"], s[4]["phase_tick"]), (2, "gather", 0))
+            self.assertEqual((s[6]["day"], s[6]["phase"], s[6]["phase_tick"]), (2, "quan", 0))
+            self.assertEqual((s[8]["day"], s[8]["phase"], s[8]["phase_tick"]), (2, "shop", 0))
+
 
 class DayCliAndScenarioValidation(unittest.TestCase):
     def test_days_flag_and_inventory_flags_exit_2(self):
