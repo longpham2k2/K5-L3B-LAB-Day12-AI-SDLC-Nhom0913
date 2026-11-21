@@ -64,3 +64,22 @@ Mục tiêu: Huy (quán, Shop), Long (gather) và Duy (`day`, pause, HUD) làm s
 **Inputs v1.1** (đã có trong `chonoi/inputs.py`): nút `interact, catch, pause, shop_done, attack, photo`; `inp.buy` là chuỗi chỉ ở đúng frame khai báo, ngược lại `None`. Pause xử lý ở `day`/runner, sim không thấy bước pause.
 
 **Dữ liệu v1.1** ở `game.contract.json`: `tuning.day_plan[]`, `tuning.shop`, `tuning.gather.monsters`, khóa cá mới, 6 món, B1–B2, T1–T4. Kho: 6 nguyên liệu (`chonoi/inventory.KINDS`).
+
+## 6. Phase 3 (v1.2) — kho cá thể (chốt bởi Long, nhánh `p3`)
+
+**File kho / `gather_end.data.inventory`:** `{"items": [{"id": "I1", "kind": "ca_linh", "fresh": 100}, ...]}` — sắp theo id, `fresh` float đầy đủ trong file (JSONL làm tròn 3 chữ số). Kho đếm `{"items": {kind: n}}` → **mã 2**. Rỗng: `{"items": []}`.
+
+**Trong sim** dùng `chonoi/items.py` (không tự viết số học độ tươi):
+
+| Hàm | Dùng cho |
+|---|---|
+| `it.load(raw)` / `it.dump(items)` | fixture/file kho → nội bộ (`fresh` là `Fraction`) / nội bộ → JSON (snapshot, event) |
+| `it.new(ids, kind, tuning)` | cá thể mới `I<n>` fresh 100 (IdAllocator dùng chung → id tăng xuyên pha/Ngày) |
+| `it.decay(items, it.per_tick(tuning, "gather"/"quan"), tuning)` | hao 1 tick; trả cá thể **vừa** ươn, sắp theo id → phát `spoiled {item_id, kind, location}` |
+| `it.is_spoiled(x, tuning)` / `it.usable(x, tuning)` | ươn khi `fresh < 30` (so Fraction, chính xác) |
+| `it.pick_freshest(pool, kind, n, tuning, exclude=ids)` | giữ chỗ: n cá thể chưa ươn tươi nhất, hòa theo id; thiếu → `None` |
+| `it.counts(items, tuning, only_usable=True)` | đếm theo loại (chọn món, HUD) |
+
+**Giao diện giữa sim** (§5 giữ nguyên tên tham số, chỉ đổi kiểu): `GatherSim.inventory_items()` → **list cá thể nội bộ**; `QuanSim(..., inventory=list cá thể)`; `QuanSim.stock` → list cá thể; `ShopSim(stock=list cá thể)`. Quán: `customers[].reserved` là **mảng id**; giá chốt khi nấu `floor(price × mean(fresh) / 100)` tính trên Fraction. Snapshot `hold`/`stock` dùng `it.dump`.
+
+**Fixture test:** `from helpers import items` → `items("ca_loc", "bong_sung")` = `[{"id":"I1","kind":"ca_loc","fresh":100}, {"id":"I2",...}]` (tham số `fresh=`, `start=`).

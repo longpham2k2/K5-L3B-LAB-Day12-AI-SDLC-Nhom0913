@@ -24,8 +24,8 @@
 
 | ID | Việc | Người | Phụ thuộc | Trạng thái |
 |---|---|---|---|---|
-| AC-P3-01 | Adapter v1.2 (hàng 1 bảng trên) | Long | — | Đang làm |
-| AC-P3-02 | Lặn: giỏ cá thể, hao tươi, `spoiled`, `lost` cá thể, bàn giao | Long | 01 | |
+| AC-P3-01 | Adapter v1.2 (hàng 1 bảng trên) | Long | — | Xong (`chonoi/items.py`, contracts §6) |
+| AC-P3-02 | Lặn: giỏ cá thể, hao tươi, `spoiled`, `lost` cá thể, bàn giao | Long | 01 | Đang làm (đã chạy ví dụ ngưỡng + bàn giao của PRD; còn test) |
 | AC-P3-03 | Quán: kho cá thể, hao tươi, `spoiled`, giữ theo id + giữ lại khi ươn | Huy | 01 | |
 | AC-P3-04 | Nấu tiêu id giữ, giá theo tươi, `cook_started.items`; `day` bàn giao cá thể; Shop stock | Duy | 01, 03 | |
 | AC-P3-05 | HUD độ tươi / hàng ươn | Duy | 02, 03 | |

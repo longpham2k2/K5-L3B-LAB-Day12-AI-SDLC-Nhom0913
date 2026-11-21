@@ -18,6 +18,11 @@ def write_json(path, obj):
     return path
 
 
+def items(*kinds, fresh=100, start=1, prefix="I"):
+    """Mảng cá thể v1.2 cho fixture: items("ca_loc", "bong_sung") -> [{"id":"I1","kind":"ca_loc","fresh":100}, ...]."""
+    return [{"id": f"{prefix}{start + i}", "kind": k, "fresh": fresh} for i, k in enumerate(kinds)]
+
+
 def frames(*fr):
     return {"frames": list(fr)}
 
