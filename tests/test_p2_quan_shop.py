@@ -12,6 +12,8 @@ from chonoi.runner import Session
 from chonoi.sim.quan import QuanSim
 from chonoi.sim.shop import ShopSim
 
+from helpers import items
+
 
 def inp(*, buy=None, done=False):
     return InputState((0.0, 0.0), {}, {"shop_done"} if done else set(), buy=buy)
@@ -39,7 +41,7 @@ class QuanV11(unittest.TestCase):
     def test_day_plan_filters_before_available_stock(self):
         sim = QuanSim(
             self.tuning,
-            {"stock": {"ca_loc": 1, "ca_keo": 2}},
+            {"stock": items("ca_loc", "ca_keo", "ca_keo")},
             Streams(2),
             IdAllocator(),
             plan_dishes=["ca_keo_nuong"],
@@ -50,7 +52,7 @@ class QuanV11(unittest.TestCase):
         self.assertEqual(events, [("customer_arrived", {
             "order_id": "C1", "table_id": "T1", "dish_id": "ca_keo_nuong",
         })])
-        self.assertEqual(sim.customers[0]["reserved"], {"ca_keo": 2})
+        self.assertEqual(sim.customers[0]["reserved"], ["I2", "I3"])
 
     def test_bad_plan_or_carry_is_rejected(self):
         with self.assertRaises(BadInput):

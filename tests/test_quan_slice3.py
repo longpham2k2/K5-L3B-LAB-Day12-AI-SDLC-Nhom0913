@@ -5,6 +5,8 @@ from chonoi.errors import BadInput
 from chonoi.inputs import LiveInputs
 from chonoi.runner import Session
 
+from helpers import items
+
 
 class QuanSlice3(unittest.TestCase):
     def setUp(self):
@@ -12,7 +14,7 @@ class QuanSlice3(unittest.TestCase):
 
     def test_arrival_reserves_recipe_and_snapshot_shows_available_stock(self):
         scenario = {
-            "stock": {"ca_loc": 1},
+            "stock": items("ca_loc"),
             "random_customers": True,
         }
         session = Session("quan", self.tuning, scenario, 1)
@@ -25,13 +27,13 @@ class QuanSlice3(unittest.TestCase):
         self.assertIn("customer_arrived", names)
         customer = session.snapshot()["state"] if False else session.sim.customers[0]
         self.assertEqual(customer["dish_id"], "ca_loc_nuong_trui")
-        self.assertEqual(customer["reserved"], {"ca_loc": 1})
+        self.assertEqual(customer["reserved"], ["I1"])
         self.assertEqual(customer["order_status"], "reserved")
         self.assertEqual(customer["order_tick"], 120)
-        self.assertEqual(session.snapshot()["stock"], {"ca_loc": 1})
+        self.assertEqual(session.snapshot()["stock"][0]["id"], "I1")
 
     def test_no_dish_when_no_recipe_is_cookable(self):
-        session = Session("quan", self.tuning, {"stock": {}, "random_customers": True}, 1)
+        session = Session("quan", self.tuning, {"stock": [], "random_customers": True}, 1)
         live = LiveInputs()
         for _ in range(119):
             session.step(live.advance())
@@ -42,7 +44,7 @@ class QuanSlice3(unittest.TestCase):
 
     def test_patience_zero_leaves_customer_and_lowers_reputation(self):
         scenario = {
-            "stock": {"ca_loc": 1},
+            "stock": items("ca_loc"),
             "random_customers": False,
             "customers": [{
                 "id": "C1",
@@ -57,17 +59,17 @@ class QuanSlice3(unittest.TestCase):
         self.assertEqual([row["name"] for row in rows], ["customer_left"])
         self.assertEqual(session.sim.customers, [])
         self.assertEqual(session.sim.reputation, 2.5)
-        self.assertEqual(session.snapshot()["stock"], {"ca_loc": 1})
+        self.assertEqual(session.snapshot()["stock"][0]["id"], "I1")
 
     def test_fixture_reservation_must_match_recipe_and_stock(self):
         scenario = {
-            "stock": {"ca_loc": 1},
+            "stock": items("ca_loc"),
             "random_customers": False,
             "customers": [{
                 "id": "C1",
                 "table_id": "T1",
                 "dish_id": "ca_loc_nuong_trui",
-                "reserved": {"ca_loc": 2},
+                "reserved": ["I1", "I2"],
             }],
         }
         with self.assertRaises(BadInput):
@@ -77,7 +79,7 @@ class QuanSlice3(unittest.TestCase):
         session = Session(
             "quan",
             self.tuning,
-            {"stock": {}, "random_customers": True},
+                {"stock": [], "random_customers": True},
             1,
         )
         live = LiveInputs()
@@ -90,7 +92,7 @@ class QuanSlice3(unittest.TestCase):
 
     def test_closing_leaves_waiting_customer_before_quan_end(self):
         scenario = {
-            "stock": {"ca_loc": 1},
+            "stock": items("ca_loc"),
             "random_customers": False,
             "time_left_ticks": 1,
             "customers": [{
@@ -113,7 +115,7 @@ class QuanSlice3(unittest.TestCase):
             "quan",
             self.tuning,
             {
-                "stock": {},
+                "stock": [],
                 "random_customers": False,
                 "customers": [{
                     "id": "C1",
@@ -126,7 +128,7 @@ class QuanSlice3(unittest.TestCase):
         )
         customer = session.sim.customers[0]
         self.assertEqual(customer["order_status"], "unfulfillable")
-        self.assertEqual(customer["reserved"], {})
+        self.assertEqual(customer["reserved"], [])
         self.assertIsNone(customer["dish_id"])
 
 
