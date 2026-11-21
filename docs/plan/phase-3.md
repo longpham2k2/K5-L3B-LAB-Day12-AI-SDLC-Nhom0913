@@ -27,9 +27,9 @@
 | AC-P3-01 | Adapter v1.2 (hàng 1 bảng trên) | Long | — | Xong (`chonoi/items.py`, contracts §6) |
 | AC-P3-02 | Lặn: giỏ cá thể, hao tươi, `spoiled`, `lost` cá thể, bàn giao | Long | 01 | Xong (`tests/test_p3_gather_fresh.py` 10 test; migrate fixture gather ở slice1/2, monsters, smoke_p1 — 2 test bàn giao chờ quán AC-P3-03) |
 | AC-P3-03 | Quán: kho cá thể, hao tươi, `spoiled`, giữ theo id + giữ lại khi ươn | Huy | 01 | Xong (`tests/test_p3_quan_fresh.py`, 5 test; suite P3 15/15) |
-| AC-P3-04 | Nấu tiêu id giữ, giá theo tươi, `cook_started.items`; `day` bàn giao cá thể; Shop stock | Duy | 01, 03 | |
-| AC-P3-05 | HUD độ tươi / hàng ươn | Duy | 02, 03 | |
-| AC-P3-06 | Migrate fixture test cũ (ghi lý do), smoke file + day (`docs/proof/phase-3/`), regression, CHANGELOG, verification, gộp `main`, tag | Long + Duy (QA) | 02–05 | |
+| AC-P3-04 | Nấu tiêu id giữ, giá theo tươi, `cook_started.items`; `day` bàn giao cá thể; Shop stock | Duy | 01, 03 | Xong (`chonoi/sim/quan.py`, `chonoi/sim/shop.py`, `chonoi/runner.py`, `tests/test_quan_slice4.py`, `tests/test_day_and_pause.py`, `tests/test_p2_quan_shop.py` — 37/37 test) |
+| AC-P3-05 | HUD độ tươi / hàng ươn | Duy | 02, 03 | Xong (`chonoi/live.py`, `chonoi/web/index.html`, `tests/test_live.py` 5/5 + ảnh `docs/proof/phase-3/hud-fresh.png`) |
+| AC-P3-06 | Migrate fixture test cũ (ghi lý do), smoke file + day (`docs/proof/phase-3/`), regression, CHANGELOG, verification, gộp `main`, tag | Long + Duy (QA) | 02–05 | Xong trên `p3` (`tools/smoke_p3.sh` 11/11 ĐẠT, 140/140 test OK, `CHANGELOG.md`, `docs/verification/phase-3.md`, `docs/retro.md`, `docs/clarify.md`, `docs/standup.md`, `docs/ai-usage-log.md`; chờ Long fast-forward `p3 -> main` & tag `phase-3`) |
 
 ## Rủi ro
 - **Đổi schema chạm mọi module** → nhánh `p3`, adapter trước, `main` không đỏ.

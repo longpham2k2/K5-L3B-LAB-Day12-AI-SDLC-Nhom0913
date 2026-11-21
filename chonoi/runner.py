@@ -118,15 +118,23 @@ class Session:
             elif mode == "shop":
                 carry = self.scenario.get("carry", {"money": 0, "earned": 0,
                                                     "reputation": tuning["quan"]["reputation_initial"]})
-                self.sim = self.factories["shop"](tuning, stock=dict(self.scenario.get("stock", {})),
+                self.sim = self.factories["shop"](tuning, stock=list(self.scenario.get("stock", [])),
                                                   carry=dict(carry), upgrades=dict(self.scenario.get("upgrades", {})))
             else:
                 self.sim = _build_quan(self.factories["quan"], tuning, self.scenario, self.streams, self.ids, inventory)
 
     def _gather_scenario_for_day(self, first_day: bool) -> dict:
         g_sc = copy.deepcopy(self.scenario.get("gather", {}))
-        if not first_day:
-            g_sc.pop("hold", None)
+        if first_day:
+            for x in g_sc.get("hold", []):
+                self.ids.reserve(x["id"])
+        else:
+            # PRD-03: Ngày kế cấp id mới theo thứ tự mảng với kind/fresh ban đầu
+            if "hold" in g_sc:
+                g_sc["hold"] = [
+                    {"id": self.ids.new("I"), "kind": x["kind"], "fresh": x["fresh"]}
+                    for x in g_sc["hold"]
+                ]
             if isinstance(g_sc.get("player"), dict):
                 for k in ("oxygen_ticks", "hp", "zero_oxy_ticks"):
                     g_sc["player"].pop(k, None)
@@ -252,7 +260,7 @@ class Session:
                                        inv, plan_dishes=list(plan["dishes"]), carry=carry)
                 rows.append(self._wrap_event("quan", "phase_start", {}))
             elif old_phase == "quan":
-                leftover = {k: v for k, v in self.sim.stock.items() if v > 0}
+                leftover = [dict(x) for x in self.sim.stock]
                 carry = {"money": self.money, "earned": self.earned, "reputation": self.reputation}
                 self.sim = self.factories["shop"](self.tuning, stock=leftover, carry=carry, upgrades=dict(self.upgrades))
                 rows.append(self._wrap_event("shop", "phase_start", {}))

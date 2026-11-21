@@ -14,7 +14,6 @@ from chonoi.sim.shop import ShopSim
 
 from helpers import items
 
-
 def inp(*, buy=None, done=False):
     return InputState((0.0, 0.0), {}, {"shop_done"} if done else set(), buy=buy)
 
@@ -68,7 +67,7 @@ class Shop(unittest.TestCase):
     def shop(self, money=0, upgrades=None, tuning=None):
         return ShopSim(
             tuning or self.tuning,
-            stock={"ca_loc": 1},
+            stock=items("ca_loc"),  # v1.2 (TICKET-03): kho cá thể
             carry={"money": money, "earned": money, "reputation": 3.0},
             upgrades={} if upgrades is None else upgrades,
         )
@@ -82,7 +81,7 @@ class Shop(unittest.TestCase):
         self.assertTrue(sim.done)
         self.assertEqual(sim.reason, "done")
         self.assertEqual((sim.money, sim.earned, sim.upgrades), (0, 200, {"oxygen": 1}))
-        self.assertEqual(sim.snapshot()["stock"], {"ca_loc": 1})
+        self.assertEqual(sim.snapshot()["stock"], items("ca_loc"))
 
     def test_funds_max_level_and_unknown_leave_state_unchanged(self):
         poor = self.shop(money=199)
@@ -103,14 +102,14 @@ class Shop(unittest.TestCase):
     def test_time_closes_after_max_ticks_and_session_builds_shop(self):
         tuning = copy.deepcopy(self.tuning)
         tuning["shop"]["max_ticks"] = 1
-        session = Session("shop", tuning, {"stock": {"bong_sung": 2}, "carry": {
+        session = Session("shop", tuning, {"stock": items("bong_sung", "bong_sung"), "carry": {
             "money": 0, "earned": 0, "reputation": 3.0,
         }, "upgrades": {}}, 1)
         self.assertEqual(session.step(inp()), [{
             "type": "event", "tick": 1, "phase": "shop", "name": "shop_end", "data": {"reason": "time"},
         }])
         self.assertTrue(session.done)
-        self.assertEqual(session.snapshot()["stock"], {"bong_sung": 2})
+        self.assertEqual(session.snapshot()["stock"], items("bong_sung", "bong_sung"))
 
 
 if __name__ == "__main__":

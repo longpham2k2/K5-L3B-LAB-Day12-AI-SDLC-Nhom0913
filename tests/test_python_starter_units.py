@@ -9,7 +9,7 @@ from chonoi.contract import load_contract
 from chonoi.inputs import InputPlayer, LiveInputs, load_frames
 from chonoi.runner import Session
 
-from helpers import Workdir, frames, write_json
+from helpers import Workdir, frames, items, write_json
 
 
 class Units(unittest.TestCase):
@@ -70,7 +70,8 @@ class Units(unittest.TestCase):
 
     def test_session_steps_gather_and_dock(self):
         tuning = load_contract()["tuning"]
-        s = Session("gather", tuning, {"hold": ["ca_loc"]}, 1)
+        # v1.2 (TICKET-03): giỏ là mảng cá thể {id, kind, fresh}
+        s = Session("gather", tuning, {"hold": items("ca_loc")}, 1)
         self.assertEqual(s.snapshot()["tick"], 0)
         li = LiveInputs()
         self.assertEqual(s.step(li.advance()), [])

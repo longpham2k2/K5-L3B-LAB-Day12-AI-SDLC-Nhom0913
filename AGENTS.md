@@ -6,6 +6,7 @@
 - Test: `PYTHONPATH=tests:. python3 -m unittest discover -s tests -v`
 - Headless: `python3 -m chonoi.headless --mode gather|quan|day --seed 1 --ticks 600 --out out.jsonl` (`day` thêm `--days 1..5`)
 - Smoke Phase 2 (tích hợp, day, regression P1 → `docs/proof/phase-2/`): `bash tools/smoke_p2.sh` (thoát ≠ 0 nếu có kiểm tra không đạt)
+- Smoke Phase 3 (v1.2 kho cá thể, day 1/2/5, regression P1–P2 → `docs/proof/phase-3/`): `bash tools/smoke_p3.sh` (thoát ≠ 0 nếu có kiểm tra không đạt)
 - Chơi thử trên trình duyệt: `python3 -m chonoi.live --mode gather|quan` (mở địa chỉ in ra; WASD, E, Space, R)
 
 ## Cấu trúc & quy ước

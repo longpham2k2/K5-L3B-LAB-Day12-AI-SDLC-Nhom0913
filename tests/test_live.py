@@ -9,6 +9,8 @@ import urllib.request
 from chonoi.contract import load_contract
 from chonoi.live import LiveGame, LiveServer
 
+from helpers import items
+
 
 def _get(url):
     with urllib.request.urlopen(url, timeout=5) as r:
@@ -61,11 +63,12 @@ class LiveServerTest(unittest.TestCase):
         tuning = load_contract()["tuning"]
         scenario = {
             "random_customers": False,
-            "stock": {"ca_loc": 2, "bong_sung": 2},
+            # v1.2 (TICKET-03): kho cá thể & reserved mảng id
+            "stock": items("ca_loc", "ca_loc", "bong_sung", "bong_sung"),
             "stoves": [{"id": "B1", "state": "cooking", "cook_ticks_left": 120,
                         "dish": {"order_id": "C1", "dish_id": "ca_loc_nuong_trui", "base_price": 60}}],
             "customers": [
-                {"id": "C1", "table_id": "T1", "dish_id": "ca_loc_nuong_trui", "order_status": "assigned", "reserved": {}},
+                {"id": "C1", "table_id": "T1", "dish_id": "ca_loc_nuong_trui", "order_status": "assigned", "reserved": []},
             ],
         }
         server = LiveServer(LiveGame("quan", tuning, scenario, 1), port=0)
@@ -77,6 +80,8 @@ class LiveServerTest(unittest.TestCase):
             st = json.loads(body)
             self.assertEqual(st["mode"], "quan")
             self.assertEqual(st["stoves"][0]["dish"]["dish_id"], "ca_loc_nuong_trui")
+            self.assertIsInstance(st["stock"], list)
+            self.assertEqual(st["stock"][0]["id"], "I1")
             code, html = _get(base + "/")
             self.assertEqual(code, 200)
             html_str = html.decode("utf-8")
@@ -90,7 +95,8 @@ class LiveServerTest(unittest.TestCase):
 
     def test_day_mode_pause_hold_and_shop_inputs(self):
         tuning = load_contract()["tuning"]
-        scenario = {"day": {"money": 300, "earned": 300}, "gather": {"hold": ["ca_loc"]}, "quan": {"time_left_ticks": 1}}
+        scenario = {"day": {"money": 300, "earned": 300}, "gather": {"hold": items("ca_loc")},
+                    "quan": {"time_left_ticks": 1}}
         server = LiveServer(LiveGame("day", tuning, scenario, 1, days=1), port=0)
         server.start()
         try:
@@ -128,6 +134,28 @@ class LiveServerTest(unittest.TestCase):
             self.assertEqual(_post(base + "/restart", {}), 200)
             st1 = json.loads(_get(base + "/state")[1])
             self.assertFalse(st1["ui_hold"])
+        finally:
+            server.stop()
+
+    def test_gather_freshness_state_and_hud_markers(self):
+        tuning = load_contract()["tuning"]
+        sc = {
+            "hold": items("ca_loc", fresh=29.5) + items("bong_sung", fresh=95, start=2),
+            "random_fish": False,
+            "monsters": [],
+        }
+        server = LiveServer(LiveGame("gather", tuning, sc, 1), port=0)
+        server.start()
+        try:
+            base = f"http://127.0.0.1:{server.port}"
+            st = json.loads(_get(base + "/state")[1])
+            self.assertEqual(st["freshness_meta"]["spoiled_below"], 30)
+            self.assertEqual([(x["id"], x["kind"]) for x in st["hold"]], [("I1", "ca_loc"), ("I2", "bong_sung")])
+            self.assertLess(st["hold"][0]["fresh"], 30)
+            self.assertGreater(st["hold"][1]["fresh"], 90)
+            html_str = _get(base + "/")[1].decode("utf-8")
+            for marker in ("freshness_meta", "isSpoiled", "formatFreshList", "ươn", "Hết món"):
+                self.assertIn(marker, html_str)
         finally:
             server.stop()
 

@@ -7,12 +7,15 @@ import json
 import os
 import unittest
 
+from chonoi import items as it
 from chonoi.contract import load_contract
-from chonoi.inputs import InputPlayer
+from chonoi.errors import BadInput
+from chonoi.inputs import InputPlayer, InputState
 from chonoi.runner import Session, run
 from chonoi.scenario import load_scenario
+from chonoi.sim.shop import ShopSim
 
-from helpers import Workdir, events, frames, read_jsonl, run_headless, snapshots, write_json
+from helpers import Workdir, events, frames, items, read_jsonl, run_headless, snapshots, write_json
 
 CONTRACT_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "game.contract.json")
 with open(CONTRACT_PATH, encoding="utf-8") as _f:
@@ -26,7 +29,9 @@ class _FakeGather:
     def __init__(self, tuning, scenario, streams, ids, *, day=1, active_upgrades=None):
         self.day = day
         self.active_upgrades = dict(active_upgrades or {})
-        self.hold = list(scenario.get("hold", []))
+        self.hold = it.load(scenario.get("hold", []))  # v1.2: kho cá thể {id, kind, fresh}
+        for x in self.hold:
+            ids.reserve(x["id"])
         self.time_left_ticks = scenario.get("time_left_ticks", 10)
         self.money = 0
         self.earned = 0
@@ -36,17 +41,14 @@ class _FakeGather:
         self.steps = 0
 
     def inventory_items(self):
-        counts = {}
-        for k in self.hold:
-            counts[k] = counts.get(k, 0) + 1
-        return {k: counts[k] for k in sorted(counts)}
+        return list(self.hold)
 
     def snapshot(self):
         return {
             "player": {"pos": [2.0, 0.0], "vel": [0.0, 0.0], "heading_deg": 0.0,
                        "oxygen_ticks": 1800, "oxygen_max_ticks": 1800, "hp": 3, "hp_max": 3,
                        "zero_oxy_ticks": 0, "invuln_ticks": 0, "catch_cd_ticks": 0, "at_surface": True},
-            "hold": list(self.hold), "hold_count": len(self.hold), "hold_capacity": 12,
+            "hold": it.dump(self.hold), "hold_count": len(self.hold), "hold_capacity": 12,
             "nodes": [], "fish": [],
         }
 
@@ -56,17 +58,17 @@ class _FakeGather:
         if inp.pressed("interact"):
             self.done = True
             self.reason = "docked"
-            return [("gather_end", {"reason": "docked", "inventory": {"items": self.inventory_items()}})]
+            return [("gather_end", {"reason": "docked", "inventory": {"items": it.dump(self.hold)}})]
         if inp.pressed("catch"):
             self.hold = []
             self.done = True
             self.reason = "fainted"
             return [("faint", {"cause": "monster", "lost": [], "hp": 0}),
-                    ("gather_end", {"reason": "fainted", "inventory": {"items": {}}})]
+                    ("gather_end", {"reason": "fainted", "inventory": {"items": []}})]
         if self.time_left_ticks <= 0:
             self.done = True
             self.reason = "time"
-            return [("gather_end", {"reason": "time", "inventory": {"items": self.inventory_items()}})]
+            return [("gather_end", {"reason": "time", "inventory": {"items": it.dump(self.hold)}})]
         return []
 
 
@@ -75,7 +77,8 @@ class _FakeQuan:
     phase = "quan"
 
     def __init__(self, tuning, scenario, streams, ids, inventory=None, *, plan_dishes=None, carry=None):
-        self.stock = dict(inventory or {})
+        self.tuning = tuning
+        self.stock = [it.make(x["id"], x["kind"], x["fresh"]) for x in (inventory or [])]
         self.plan_dishes = list(plan_dishes or [])
         carry = carry or {}
         self.money = carry.get("money", 0)
@@ -87,19 +90,20 @@ class _FakeQuan:
         self.reason = None
 
     def snapshot(self):
-        return {"player": {"pos": [8.0, 5.0], "vel": [0.0, 0.0]}, "stock": dict(self.stock),
+        return {"player": {"pos": [8.0, 5.0], "vel": [0.0, 0.0]}, "stock": it.dump(self.stock),
                 "hand": None, "stoves": [], "tables": [], "customers": []}
 
     def step(self, inp):
         self.time_left_ticks = max(0, self.time_left_ticks - 1)
-        if inp.pressed("interact") and self.stock.get("ca_loc", 0) > 0:
-            self.stock["ca_loc"] -= 1
-            if self.stock["ca_loc"] == 0:
-                del self.stock["ca_loc"]
-            self.money += 200
-            self.earned += 200
-            self.shift_earned += 200
-            self.reputation = min(5.0, self.reputation + 0.2)
+        if inp.pressed("interact"):
+            idx = next((i for i, x in enumerate(self.stock)
+                        if x["kind"] == "ca_loc" and it.usable(x, self.tuning)), None)
+            if idx is not None:
+                self.stock.pop(idx)
+                self.money += 200
+                self.earned += 200
+                self.shift_earned += 200
+                self.reputation = min(5.0, self.reputation + 0.2)
         if self.time_left_ticks <= 0:
             self.done = True
             self.reason = "time"
@@ -113,7 +117,7 @@ class _FakeShop:
     phase = "shop"
 
     def __init__(self, tuning, *, stock, carry, upgrades):
-        self.stock = dict(stock)
+        self.stock = [it.make(x["id"], x["kind"], x["fresh"]) for x in stock]
         self.upgrades = upgrades
         self.money = carry.get("money", 0)
         self.earned = carry.get("earned", 0)
@@ -124,7 +128,7 @@ class _FakeShop:
         self._cfg = tuning["shop"]["upgrades"]
 
     def snapshot(self):
-        return {"stock": dict(self.stock)}
+        return {"stock": it.dump(self.stock)}
 
     def step(self, inp):
         evs = []
@@ -200,7 +204,7 @@ class PauseTests(unittest.TestCase):
     def test_pause_in_quan_and_tick_limit_while_paused(self):
         with Workdir() as w:
             fr = frames({"tick": 1, "pause": True}, {"tick": 2, "interact": True})["frames"]
-            run("quan", TUNING, {"random_customers": False, "stock": {"ca_loc": 1}}, 1,
+            run("quan", TUNING, {"random_customers": False, "stock": items("ca_loc")}, 1,
                 fr, 4, w.path("q.jsonl"), 1)
             rows = read_jsonl(w.path("q.jsonl"))
             end = rows[-1]
@@ -211,7 +215,7 @@ class PauseTests(unittest.TestCase):
 
     def test_pause_ignores_buy_in_shop(self):
         with Workdir() as w:
-            sc = {"day": {"money": 300, "earned": 300}, "gather": {"hold": ["ca_loc"]},
+            sc = {"day": {"money": 300, "earned": 300}, "gather": {"hold": items("ca_loc")},
                   "quan": {"time_left_ticks": 1}}
             fr = frames(
                 {"tick": 0, "interact": True},   # tick 1: gather_end -> quan (phase_tick 0)
@@ -235,7 +239,7 @@ class DayFlowTests(unittest.TestCase):
         with Workdir() as w:
             sc = {
                 "day": {"money": 50, "earned": 50},
-                "gather": {"hold": ["ca_loc"]},
+                "gather": {"hold": items("ca_loc")},  # v1.2: kho cá thể
                 "quan": {"time_left_ticks": 2},
             }
             # Ngày 1: tick 0 interact (đóng gather -> quan), tick 2 interact (bán cá +200 -> money=250),
@@ -313,7 +317,7 @@ class DayFlowTests(unittest.TestCase):
 
     def test_active_upgrades_stays_empty_during_same_day_shop(self):
         with Workdir() as w:
-            sc = {"day": {"money": 300, "earned": 300}, "gather": {"hold": ["ca_loc"]},
+            sc = {"day": {"money": 300, "earned": 300}, "gather": {"hold": items("ca_loc")},
                   "quan": {"time_left_ticks": 1}}
             fr = frames(
                 {"tick": 0, "interact": True},  # -> quan
@@ -364,12 +368,109 @@ class DayFlowTests(unittest.TestCase):
             self.assertEqual((s[6]["day"], s[6]["phase"], s[6]["phase_tick"]), (2, "quan", 0))
             self.assertEqual((s[8]["day"], s[8]["phase"], s[8]["phase_tick"]), (2, "shop", 0))
 
+    def test_day_handoff_preserves_item_fresh_and_new_day_allocates_ids(self):
+        """TICKET-03: day bàn giao cá thể (gồm hàng ươn) sang Shop không hao tươi; Ngày kế cấp id mới giữ kind/fresh."""
+        with Workdir() as w:
+            sc = {
+                "day": {},
+                "gather": {"hold": [
+                    {"id": "I1", "kind": "ca_loc", "fresh": 85.5},
+                    {"id": "I2", "kind": "bong_sung", "fresh": 25},
+                ]},
+                "quan": {"time_left_ticks": 1},
+            }
+            fr = frames(
+                {"tick": 0, "interact": True},    # step 0 -> tick 1: gather -> quan
+                {"tick": 1, "interact": False},   # step 1 -> tick 2: quan_end -> shop (giữ nguyên id + fresh + ươn)
+                {"tick": 2},                      # step 2 -> tick 3: shop không hao tươi
+                {"tick": 3, "shop_done": True},   # step 3 -> tick 4: sang Ngày 2 -> cấp I3, I4 với kind/fresh ban đầu
+            )["frames"]
+            run("day", TUNING, sc, 1, fr, 5, w.path("d.jsonl"), 1, days=2,
+                sim_factories={"gather": _FakeGather, "quan": _FakeQuan, "shop": ShopSim})
+            s = {r["tick"]: r for r in snapshots(read_jsonl(w.path("d.jsonl")))}
+            self.assertEqual(s[0]["hold"], [{"id": "I1", "kind": "ca_loc", "fresh": 85.5},
+                                            {"id": "I2", "kind": "bong_sung", "fresh": 25.0}])
+            self.assertEqual(s[1]["stock"], s[0]["hold"])
+            self.assertEqual(s[2]["stock"], s[0]["hold"])
+            self.assertEqual(s[3]["stock"], s[0]["hold"], "Shop không làm hao tươi")
+            self.assertEqual(s[4]["day"], 2)
+            self.assertEqual(s[4]["hold"], [{"id": "I3", "kind": "ca_loc", "fresh": 85.5},
+                                            {"id": "I4", "kind": "bong_sung", "fresh": 25.0}])
+
+    def test_shop_v12_stock_rejects_count_dict_and_keeps_spoiled(self):
+        with self.assertRaises(BadInput):
+            ShopSim(TUNING, stock={"ca_loc": 1}, carry={"money": 0, "earned": 0, "reputation": 3.0}, upgrades={})
+        sim = ShopSim(
+            TUNING,
+            stock=[it.make("I1", "ca_loc", 92.5), it.make("I2", "bong_sung", 15)],
+            carry={"money": 0, "earned": 0, "reputation": 3.0},
+            upgrades={},
+        )
+        sim.step(InputState((0.0, 0.0), {}, set()))
+        self.assertEqual(sim.snapshot()["stock"], [
+            {"id": "I1", "kind": "ca_loc", "fresh": 92.5},
+            {"id": "I2", "kind": "bong_sung", "fresh": 15.0},
+        ])
+
+    def test_real_sims_two_days_freshness_cook_shop_and_new_day_ids(self):
+        """Tích hợp thật (không fake): GatherSim -> QuanSim (giá theo tươi) -> ShopSim -> Ngày 2 id mới & upgrade."""
+        sc = {
+            "day": {"money": 150, "earned": 150},
+            "gather": {"hold": [{"id": "I1", "kind": "ca_loc", "fresh": 100}], "random_fish": False, "monsters": []},
+            "quan": {
+                "random_customers": False,
+                "player": {"pos": list(TUNING["quan"]["stoves"][0]["pos"])},
+                "tables": [{"id": "T1", "pos": [4, 8]}],
+                "time_left_ticks": 1050,
+                "customers": [{"id": "C1", "table_id": "T1", "dish_id": "ca_loc_nuong_trui", "order_tick": 0}],
+            },
+        }
+        sess = Session("day", TUNING, sc, 1, days=2)
+        idle = lambda: InputState((0.0, 0.0), {}, set())
+        press_e = lambda: InputState((0.0, 0.0), {}, {"interact"})
+
+        # Gather -> dock -> Quan (bàn giao I1 có fresh 100 - 1/120)
+        evs1 = sess.step(press_e())
+        self.assertEqual([e["name"] for e in evs1], ["gather_end", "phase_start"])
+        self.assertEqual(sess.snapshot()["phase"], "quan")
+        self.assertEqual(sess.snapshot()["customers"][0]["reserved"], ["I1"])
+
+        # Nấu C1 tại bếp B1 -> chốt giá 59k (60 * 99.9833 / 100)
+        cook_evs = sess.step(press_e())
+        self.assertEqual(cook_evs[0]["name"], "cook_started")
+        self.assertEqual(cook_evs[0]["data"]["base_price"], 59)
+        self.assertEqual(cook_evs[0]["data"]["items"][0]["id"], "I1")
+
+        # Chờ chín rồi bưng -> đi sang T1 [4, 8] -> phục vụ -> ăn xong -> hết ca sang Shop
+        while not any(e["name"] == "dish_ready" for e in sess.step(idle())):
+            pass
+        pick_evs = sess.step(press_e())
+        self.assertEqual(pick_evs[0]["name"], "dish_picked")
+        for _ in range(36):
+            sess.step(InputState((1.0, 0.0), {}, set()))
+        serve_evs = sess.step(press_e())
+        self.assertEqual(serve_evs[0]["name"], "served")
+        self.assertEqual(serve_evs[0]["data"]["tip"], 11)
+        while sess.snapshot()["phase"] != "shop":
+            sess.step(idle())
+        self.assertEqual((sess.money, sess.earned), (220, 220))
+        self.assertEqual(sess.snapshot()["stock"], [])
+
+        # Mua oxygen trong Shop -> sang Ngày 2 áp dụng oxy 2700 và cấp id mới I2 cho hold mẫu
+        day2_evs = sess.step(InputState((0.0, 0.0), {}, {"shop_done"}, buy="oxygen"))
+        self.assertEqual([e["name"] for e in day2_evs], ["bought", "shop_end", "day_start", "day_plan", "phase_start"])
+        s2 = sess.snapshot()
+        self.assertEqual(s2["day"], 2)
+        self.assertEqual(s2["active_upgrades"], {"oxygen": 1})
+        self.assertEqual(s2["player"]["oxygen_max_ticks"], 2700)
+        self.assertEqual(s2["hold"], [{"id": "I2", "kind": "ca_loc", "fresh": 100.0}])
+
 
 class DayCliAndScenarioValidation(unittest.TestCase):
     def test_days_flag_and_inventory_flags_exit_2(self):
         with Workdir() as w:
             out = w.path("o.jsonl")
-            inv = write_json(w.path("inv.json"), {"items": {"ca_loc": 1}})
+            inv = write_json(w.path("inv.json"), {"items": items("ca_loc")})
             for args in (
                 ("--mode", "gather", "--days", "1", "--seed", "1", "--ticks", "0", "--out", out),
                 ("--mode", "quan", "--days", "2", "--seed", "1", "--ticks", "0", "--out", out),
@@ -403,7 +504,7 @@ class DayCliAndScenarioValidation(unittest.TestCase):
 
             # Các scenario lỗi -> mã 2
             bad_blocks = [
-                {"quan": {"stock": {"ca_loc": 1}}},
+                {"quan": {"stock": items("ca_loc")}},
                 {"quan": {"reputation": 4.0}},
                 {"day": {"money": 100}},  # thiếu earned
                 {"day": {"money": 200, "earned": 100}},  # money > earned

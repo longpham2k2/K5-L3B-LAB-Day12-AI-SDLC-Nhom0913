@@ -135,6 +135,7 @@ class LiveGame:
             snap["meta"] = self.tuning.get(phase, {})
             snap["menu_meta"] = self.tuning["menu"]
             snap["shop_meta"] = self.tuning["shop"]
+            snap["freshness_meta"] = self.tuning.get("freshness", {})
             snap["events"] = list(self.events)
             snap["stats"] = dict(self._stats)
             snap["ui_hold"] = self.ui_hold

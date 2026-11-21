@@ -11,6 +11,7 @@ Nhóm viết tiếp (PRD-0 mục F, Quán):
 """
 
 from decimal import Decimal
+from fractions import Fraction
 import math
 
 from .. import items as it
@@ -499,12 +500,16 @@ class QuanSim:
             selected = {item_id for item_id in c["reserved"]}
             used_items = [item for item in self.stock if item["id"] in selected]
             self.stock = [item for item in self.stock if item["id"] not in selected]
-            # AC-P3-04 sẽ đổi payload này thành list cá thể và chốt giá theo fresh.
-            items = sorted(item["kind"] for item in used_items)
+            used_sorted = sorted(used_items, key=lambda x: (x["kind"], id_key(x["id"])))
+            items = it.dump(used_sorted)
             c["reserved"] = []
             c["order_status"] = "assigned"
             dish_cfg = self.menu[c["dish_id"]]
-            base_price = dish_cfg["price"]
+            if used_items:
+                mean_fresh = sum(item["fresh"] for item in used_items) / len(used_items)
+                base_price = math.floor(Fraction(dish_cfg["price"]) * mean_fresh / 100)
+            else:
+                base_price = dish_cfg["price"]
             stove["state"] = "cooking"
             stove["dish"] = {"order_id": c["id"], "dish_id": c["dish_id"], "base_price": base_price}
             stove["cook_ticks_left"] = int(round(dish_cfg["cook_s"] * TICK))

@@ -5,10 +5,12 @@ Shop chỉ sửa ``money`` và ``upgrades`` đã mua. DaySim sẽ sao các cấp
 đang diễn ra.
 """
 
+from fractions import Fraction
 import math
 
+from .. import items as it
 from ..errors import BadInput
-from ..inventory import validate_items
+from ..inventory import validate_item_list
 
 
 def _nonneg_int(value) -> bool:
@@ -27,7 +29,12 @@ class ShopSim:
 
     def __init__(self, tuning, *, stock, carry, upgrades):
         self.t = tuning["shop"]
-        self.stock = validate_items(stock)
+        raw_stock = [
+            {**x, "fresh": float(x["fresh"])} if isinstance(x, dict) and isinstance(x.get("fresh"), Fraction) else x
+            for x in stock
+        ] if isinstance(stock, list) else stock
+        validate_item_list(raw_stock, name="shop.stock")
+        self.stock = [it.make(x["id"], x["kind"], x["fresh"]) for x in stock]
         self.upgrade_defs = self._validate_upgrade_defs(self.t.get("upgrades"))
         self.money, self.earned, self.reputation = self._validate_carry(carry, tuning["quan"])
         self.upgrades = self._validate_upgrades(upgrades)
@@ -85,7 +92,7 @@ class ShopSim:
 
     def snapshot(self) -> dict:
         return {
-            "stock": {kind: self.stock[kind] for kind in sorted(self.stock)},
+            "stock": it.dump(self.stock),
             "upgrades": {name: self.upgrades[name] for name in sorted(self.upgrades)},
         }
 

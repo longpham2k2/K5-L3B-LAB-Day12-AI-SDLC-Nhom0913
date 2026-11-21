@@ -1,0 +1,11 @@
+# Regression P1–P2 với số chuẩn v1.2 — 2026-11-21T05:19:58Z, commit 9bb69d0+dirty
+# Test cũ đổi vì luật v1.2 (kho cá thể, giữ theo id, giá theo tươi): ghi rõ trong test và CHANGELOG.md.
+----------------------------------------------------------------------
+Ran 125 tests in 35.548s
+
+OK
+
+# Toàn bộ bộ test (P1 + P2 + P3)
+Ran 140 tests in 38.210s
+
+OK

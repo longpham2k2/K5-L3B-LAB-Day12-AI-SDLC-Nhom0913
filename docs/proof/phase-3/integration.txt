@@ -1,0 +1,21 @@
+# Smoke bàn giao kho cá thể v1.2 (TICKET-03 mục 1) — 2026-11-21T05:19:58Z, commit 9bb69d0+dirty
+--- dock.json
+{"gather":{"hold":[{"id":"I1","kind":"ca_linh","fresh":100}],"random_fish":false,"monsters":[]}}
+$ /c/Users/Admin/AppData/Local/Programs/Python/Python312/python -m chonoi.headless --mode gather --seed 42 --scenario dock.json --inputs dock-inputs.json --ticks 1 --out gather.jsonl --inventory-out catch.json
+exit=0
+--- catch.json
+{"items":[{"id":"I1","kind":"ca_linh","fresh":99.99166666666666}]}
+--- gather_end
+{"type":"event","tick":1,"phase":"gather","name":"gather_end","data":{"reason":"docked","inventory":{"items":[{"id":"I1","kind":"ca_linh","fresh":99.992}]}}}
+$ /c/Users/Admin/AppData/Local/Programs/Python/Python312/python -m chonoi.headless --mode quan --seed 42 --inventory catch.json --ticks 0 --out quan.jsonl
+exit=0
+--- quan snapshot tick 0: stock / bếp / bàn
+stock [{'id': 'I1', 'kind': 'ca_linh', 'fresh': 99.992}]
+stoves ['B1', 'B2']
+tables ['T1', 'T2', 'T3', 'T4']
+old_count_inventory_exit=2
+--- kiểm tra
+ĐẠT  catch.json đúng schema cá thể và fresh chính xác (100 - 0.5/60)
+ĐẠT  gather_end.inventory == catch.json
+ĐẠT  quan tick 0 nhận đúng id, kind và độ tươi từ catch.json
+ĐẠT  file kho đếm v1.1 bị từ chối mã thoát 2
