@@ -29,4 +29,5 @@
 
 ## Skills / hooks của nhóm
 - (Ghi tên và khi nào dùng; tối thiểu 2 skill/hook/command nhóm tự viết, đặt ở `.agents/skills/` hoặc tương đương.)
+- `tools/package_release.sh [ref] [version]` — đóng gói Release bằng `git archive` rồi tự chạy toàn bộ test trong bản giải nén (dùng trước khi công bố v1.0.0).
 - `tools/smoke_p2.sh` — chạy trước khi gắn tag `phase-2` và sau mỗi lần gộp lát lớn: smoke hai tiến trình, `day` 1/2/5 Ngày, regression P1; tự ghi bằng chứng kèm commit.

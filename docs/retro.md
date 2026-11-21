@@ -23,8 +23,15 @@
   - Mọi lần đổi schema dữ liệu lõi cần khóa helper test dùng chung (`items(...)`), nhánh tích hợp riêng và chạy toàn bộ `discover -s tests` trước khi hợp nhất `p3 -> main`.
 
 ## Phase 4 (cuối)
-- Rà lại hành động Phase 2: đã làm chưa? vì sao?
-- Điều tốt / điều tệ:
-- Số liệu: số commit theo người, cách đọc code của nhau, token theo người:
-- Một lần AI sai và cách nhóm phát hiện:
-- Nếu làm lại, đổi gì:
+- **Rà lại hành động Phase 2** ("trước khi push phải chạy test trên bản sạch — hook `pre-push`, người nhận: Huy"): **chưa làm.** Không có hook nào trong `.git/hooks`, không có mục hook trong `AGENTS.md`. Hệ quả đo được: ở Phase 3 lại có một push thiếu `quan.py` ([`8a0fbfc`](https://github.com/longpham2k2/K5-L3B-LAB-Day12-AI-SDLC-Nhom0913/commit/8a0fbfc), chỉ có file test) làm nhánh `p3` đỏ tới khi có [`9bb69d0`](https://github.com/longpham2k2/K5-L3B-LAB-Day12-AI-SDLC-Nhom0913/commit/9bb69d0). Vì sao: mỗi phase quá ngắn, hành động không có hạn cụ thể và không ai nhắc ở standup. Điều đã giảm thiểu được: làm Phase 3 trên nhánh `p3` nên lỗi không chạm `main`.
+- **Điều tốt:**
+  - Chốt hợp đồng sớm ở mọi phase (`docs/contracts/README.md` §1–§6) → 3 người làm song song, tích hợp ít xung đột.
+  - Test trước + review chéo bằng kịch bản thật bắt được lỗi trước tag (tên trường event P1, `base_price` đơn assigned, thiếu snapshot đổi pha P2).
+  - Bằng chứng chạy lại được bằng script (`tools/smoke_p2.sh`, `tools/smoke_p3.sh`, `tools/package_release.sh`).
+- **Điều tệ:**
+  - Push thiếu file 3 lần (P2 ×2, P3 ×1); tag `phase-3` lần đầu trỏ nhầm commit Phase 2 (lệnh gộp/tag sai thứ tự) phải gắn lại.
+  - Việc dồn không đều: `day`/HUD/bench rơi vào Duy ở P2 và P4.
+- **Số liệu:** commit không tính merge từ đầu lab — longpham2k2 23, HyperSyst 14, tran85122-afk 8 (commit của Duy ít nhưng lớn: lát 4, `day`, HUD, migrate P3). Đọc code của nhau: Long review mọi push của Huy/Duy bằng `git show --stat` + chạy kịch bản headless; Duy review chéo gather/smoke (xem `docs/members/`). Token theo người: không đo được (ghi `—` trong `docs/ai-usage-log.md`).
+- **Một lần AI sai và cách nhóm phát hiện:** ở Phase 3, test ngưỡng do AI viết dùng `fresh = 30 + 2/120` — số thực JSON không biểu diễn chính xác nên hàng ươn sớm 1 tick. Phát hiện vì test đỏ ở đúng tick biên; xác minh bằng cách tính tay với `Fraction`, đổi fixture thành 30.5 (đúng 30.0 sau 60 bước, ươn ở bước 61) và ghi `docs/clarify.md` #26.
+- **Hành động tiếp theo:** cài hook `pre-push` chạy toàn bộ test **ngay đầu buổi** (không để giữa phase), và đưa "hành động retro" thành một dòng có hạn trong plan của phase kế.
+- **Nếu làm lại, đổi gì:** chia `day`/HUD cho 2 người từ đầu; luôn tạo tag sau khi `main` đã push và kiểm `git ls-remote` ngay.

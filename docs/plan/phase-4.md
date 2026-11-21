@@ -10,7 +10,7 @@
 | AC-P4-04 | Đóng gói: thử clone sạch (≤ 3 lệnh macOS/Linux), README (môi trường, điều khiển, test, headless, bench, soak), rà `CREDITS.md`/`LICENSE`, bản đóng gói `.zip` | Đóng gói | Huy | |
 | AC-P4-05 | Retro P4 (rà hành động P2 — hook `pre-push`), phản tư `docs/members/` đủ 3 người, standup, ai-usage-log, clarify | Điều phối retro | Huy + mọi người | |
 | AC-P4-06 | `docs/verification/phase-4.md`, regression P1–P3 | Bench/QA | Duy | |
-| AC-P4-07 | Release notes, rà `CHANGELOG.md` theo phase, tag `phase-4` + GitHub Release v1.0.0 (đính kèm .zip) cùng commit trên `main` | Release | Long | |
+| AC-P4-07 | Release notes, rà `CHANGELOG.md` theo phase, tag `phase-4` + GitHub Release v1.0.0 (đính kèm .zip) cùng commit trên `main` | Release | Long | Chuẩn bị xong (`CHANGELOG.md` 4 phase, `docs/release/v1.0.0.md`, `tools/package_release.sh`); chờ `chonoi.bench` của Duy để gắn tag + Release |
 
 **Mốc:** phút 0–15 song song 01–04 · phút 15–25 retro, phản tư, verification · phút 25–30 kiểm commit/artifact → tag + Release (Long).
 
