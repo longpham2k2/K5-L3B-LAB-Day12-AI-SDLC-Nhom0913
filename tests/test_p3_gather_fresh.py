@@ -32,7 +32,8 @@ def snap(rows, tick):
 
 class Contract12(unittest.TestCase):
     def test_version_and_freshness_block(self):
-        self.assertEqual(C["contract_version"], "1.2")
+        # v1.3 (TICKET-04): chỉ thêm bench_cmd/soak_cmd; gameplay, kho, JSONL giữ như v1.2
+        self.assertEqual(C["contract_version"], "1.3")
         self.assertEqual(C["tuning"]["freshness"],
                          {"initial": 100, "gather_decay_per_s": 0.5, "quan_decay_per_s": 0.25, "spoiled_below": 30})
 

@@ -123,6 +123,11 @@ class Session:
             else:
                 self.sim = _build_quan(self.factories["quan"], tuning, self.scenario, self.streams, self.ids, inventory)
 
+    def _plan(self) -> dict:
+        """Kế hoạch của Ngày hiện tại; D1–D5 lặp lại ở Ngày 6+ (TICKET-04 mục 2, soak 10 Ngày)."""
+        n = len(self.plans)
+        return self.plans[(self.day - 1) % n + 1] if self.day not in self.plans else self.plans[self.day]
+
     def _gather_scenario_for_day(self, first_day: bool) -> dict:
         g_sc = copy.deepcopy(self.scenario.get("gather", {}))
         if first_day:
@@ -161,7 +166,7 @@ class Session:
         """Sự kiện đầu ngày tại tick 0 cho `--mode day`."""
         if self.mode != "day":
             return []
-        plan = self.plans[self.day]
+        plan = self._plan()
         return [
             self._wrap_event("gather", "day_start", {}, tick=0, day=self.day),
             self._wrap_event("gather", "day_plan", {
@@ -199,7 +204,7 @@ class Session:
             "score": earned + mult * math.floor(rep),
         }
         if self.mode == "day":
-            plan = self.plans[self.day]
+            plan = self._plan()
             s.update({
                 "day": self.day,
                 "day_plan": {"dishes": dict(plan["dishes"]), "ingredients": dict(plan["ingredients"])},
@@ -254,7 +259,7 @@ class Session:
             if old_phase == "gather":
                 inv = self.sim.inventory_items()
                 q_sc = copy.deepcopy(self.scenario.get("quan", {}))
-                plan = self.plans[self.day]
+                plan = self._plan()
                 carry = {"money": self.money, "earned": self.earned, "reputation": self.reputation}
                 self.sim = _build_quan(self.factories["quan"], self.tuning, q_sc, self.streams, self.ids,
                                        inv, plan_dishes=list(plan["dishes"]), carry=carry)
@@ -273,7 +278,7 @@ class Session:
                     self.day += 1
                     self.active_upgrades = dict(self.upgrades)
                     self.sim = self._make_gather(first_day=False)
-                    plan = self.plans[self.day]
+                    plan = self._plan()
                     rows.append(self._wrap_event("gather", "day_start", {}))
                     rows.append(self._wrap_event("gather", "day_plan", {
                         "dishes": dict(plan["dishes"]),
