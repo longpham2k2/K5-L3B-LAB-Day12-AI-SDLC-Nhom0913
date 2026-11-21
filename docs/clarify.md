@@ -23,5 +23,8 @@
 | 19 | 2026-11-21 (P2) | `fish_initial` "là số 8" — 8 đàn đầu ca chọn thế nào? | **Giả định:** lặp 8 lần đúng thuật toán sinh cá (loài theo trọng số chuẩn hóa trên loài còn điểm cách mọi đàn > 1 m, chọn đều điểm, hướng theo seed), luồng RNG `fish_spawn`, id F1–F8. | Long |
 | 20 | 2026-11-21 (P2) | "Hướng ban đầu theo seed" — góc liên tục hay rời rạc? | **Giả định:** góc đều trong [0, 360) độ, làm tròn 3 chữ số. | Long |
 | 21 | 2026-11-21 (P2) | `attack`/`photo` khi chưa bật mở rộng: mã 2 hay bỏ qua? | **Quyết định:** theo mục 4.2 "mở rộng chưa bật thì bỏ qua" → nút hợp lệ, bị bỏ qua. Đã sửa test P1 (trước coi `attack` là nút lạ). | Long |
+| 22 | 2026-11-21 (P2) | Ngưỡng "người chơi ở d ≥ 10" cho phát hiện/chạm: số cố định hay theo loài? | **Giả định:** lấy cận dưới `depths` của loài (Cá Sấu 10; Rắn ở mở rộng là 8 — khớp câu "ngưỡng độ sâu của loài"). | Long |
+| 23 | 2026-11-21 (P2) | Bước Cá Sấu vừa hết recoil có được chạm không? | **Giả định:** không — "xét phát hiện/chạm từ bước kế"; bước đó chỉ di chuyển lùi lần cuối rồi về patrol. | Long |
+| 24 | 2026-11-21 (P2) | Chase/patrol đổi trạng thái trước hay sau khi di chuyển trong cùng bước? | **Giả định:** xét chuyển trạng thái theo vị trí người chơi sau khi bơi, rồi di chuyển theo trạng thái mới ngay bước đó. | Long |
 
 > **Cách làm khi chưa hỏi được Anh Năm:** làm trước phần PRD đã rõ; chỗ mơ hồ cài theo giả định trên, viết test ghi rõ "giả định #n", để dễ sửa khi có câu trả lời. Có trả lời thì cập nhật cột "Trả lời / giả định" và ghi giờ.

@@ -10,7 +10,8 @@ import json
 from .errors import BadInput
 from .inventory import KINDS_P1, validate_items
 
-GATHER_KEYS = {"player", "hold", "nodes", "fish", "random_fish", "time_left_ticks"}
+GATHER_KEYS = {"player", "hold", "nodes", "fish", "random_fish", "time_left_ticks", "monsters"}
+MONSTER_KEYS = {"id", "kind", "pos", "waypoints", "target_idx", "state", "state_ticks_left", "recoil_dir"}
 GATHER_PLAYER_KEYS = {"pos", "vel", "heading_deg", "hp", "oxygen_ticks", "zero_oxy_ticks",
                       "invuln_ticks", "catch_cd_ticks"}
 NODE_KINDS = ("bong_dien_dien", "bong_sung", "keo_neo")
@@ -140,6 +141,46 @@ def _validate_gather(b, tuning):
             raise BadInput(f"fish.{f['id']}.heading_deg phải là số")
         if "age_ticks" in f:
             _nonneg_int(f"fish.{f['id']}.age_ticks", f["age_ticks"])
+    if "monsters" in b:
+        _validate_monsters(b["monsters"], g)
+
+
+def _validate_monsters(arr, g):
+    """TICKET-02 mục 4.3: gather.monsters[] thay danh sách mặc định."""
+    _check_ids("monsters", arr)
+    species = g["monsters"]["species"]
+    bounds = g["bounds"]
+    for m in arr:
+        mid = m["id"]
+        extra = set(m) - MONSTER_KEYS
+        if extra:
+            raise BadInput(f"monsters.{mid}: trường lạ {sorted(extra)}")
+        if m.get("kind") not in species:
+            raise BadInput(f"monsters.{mid}: kind phải thuộc {sorted(species)}")
+        lo, hi = species[m["kind"]]["depths"]
+        _pos(f"monsters.{mid}.pos", m.get("pos"), bounds)
+        if not (lo <= m["pos"][1] <= hi):
+            raise BadInput(f"monsters.{mid}.pos: d phải trong dải loài [{lo}, {hi}]")
+        wps = m.get("waypoints")
+        if not (isinstance(wps, list) and len(wps) == 2):
+            raise BadInput(f"monsters.{mid}.waypoints phải có đúng 2 điểm")
+        for i, wp in enumerate(wps):
+            _pos(f"monsters.{mid}.waypoints[{i}]", wp, bounds)
+        if m.get("target_idx", 1) not in (0, 1) or isinstance(m.get("target_idx"), bool):
+            raise BadInput(f"monsters.{mid}.target_idx phải là 0 hoặc 1")
+        state = m.get("state", "patrol")
+        if state not in ("patrol", "chase", "recoil"):
+            raise BadInput(f"monsters.{mid}.state phải là patrol, chase hoặc recoil")
+        left, rdir = m.get("state_ticks_left", 0), m.get("recoil_dir")
+        _nonneg_int(f"monsters.{mid}.state_ticks_left", left)
+        if state == "recoil":
+            if left <= 0:
+                raise BadInput(f"monsters.{mid}: recoil cần state_ticks_left > 0")
+            if not (isinstance(rdir, list) and len(rdir) == 2 and all(_num(c) for c in rdir)
+                    and abs(rdir[0] ** 2 + rdir[1] ** 2 - 1) < 1e-6):
+                raise BadInput(f"monsters.{mid}: recoil cần recoil_dir là vector đơn vị")
+        elif left != 0 or rdir is not None:
+            raise BadInput(f"monsters.{mid}: {state} không có state_ticks_left/recoil_dir")
 
 
 def _validate_quan(b, tuning):

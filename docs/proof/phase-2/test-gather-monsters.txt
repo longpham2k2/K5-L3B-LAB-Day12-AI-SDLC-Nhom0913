@@ -1,0 +1,19 @@
+# 2026-11-21T03:57:59Z base b226132 — AC-P2-03 Cá Sấu, Máu, ngất
+test_faint_by_monster (tests.test_gather_monsters_p2.Hit.test_faint_by_monster) ... ok
+test_hit_loses_hp_drops_half_lifo_and_sets_invuln_and_recoil (tests.test_gather_monsters_p2.Hit.test_hit_loses_hp_drops_half_lifo_and_sets_invuln_and_recoil) ... ok
+test_no_hit_while_invulnerable_and_no_recoil (tests.test_gather_monsters_p2.Hit.test_no_hit_while_invulnerable_and_no_recoil) ... ok
+test_one_hit_per_step_nearest_then_id (tests.test_gather_monsters_p2.Hit.test_one_hit_per_step_nearest_then_id) ... ok
+test_active_upgrades_set_max_oxygen_and_hp (tests.test_gather_monsters_p2.Layout.test_active_upgrades_set_max_oxygen_and_hp) ... ok
+test_bad_monster_fixture_exit_2 (tests.test_gather_monsters_p2.Layout.test_bad_monster_fixture_exit_2) ... ok
+test_m2_from_day_3 (tests.test_gather_monsters_p2.Layout.test_m2_from_day_3) ... ok
+test_standalone_uses_day1_layout (tests.test_gather_monsters_p2.Layout.test_standalone_uses_day1_layout) ... ok
+test_chase_back_to_patrol_when_far (tests.test_gather_monsters_p2.Movement.test_chase_back_to_patrol_when_far) ... ok
+test_chase_when_player_deep_and_close (tests.test_gather_monsters_p2.Movement.test_chase_when_player_deep_and_close) ... ok
+test_clamped_to_species_depth (tests.test_gather_monsters_p2.Movement.test_clamped_to_species_depth) ... ok
+test_no_chase_when_player_shallow (tests.test_gather_monsters_p2.Movement.test_no_chase_when_player_shallow) ... ok
+test_patrol_speed_and_switch_target_on_arrival (tests.test_gather_monsters_p2.Movement.test_patrol_speed_and_switch_target_on_arrival) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.689s
+
+OK
