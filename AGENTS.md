@@ -4,7 +4,8 @@
 
 ## Lệnh
 - Test: `PYTHONPATH=tests:. python3 -m unittest discover -s tests -v`
-- Headless: `python3 -m chonoi.headless --mode gather|quan --seed 1 --ticks 600 --out out.jsonl`
+- Headless: `python3 -m chonoi.headless --mode gather|quan|day --seed 1 --ticks 600 --out out.jsonl` (`day` thêm `--days 1..5`)
+- Smoke Phase 2 (tích hợp, day, regression P1 → `docs/proof/phase-2/`): `bash tools/smoke_p2.sh` (thoát ≠ 0 nếu có kiểm tra không đạt)
 - Chơi thử trên trình duyệt: `python3 -m chonoi.live --mode gather|quan` (mở địa chỉ in ra; WASD, E, Space, R)
 
 ## Cấu trúc & quy ước
@@ -27,3 +28,4 @@
 
 ## Skills / hooks của nhóm
 - (Ghi tên và khi nào dùng; tối thiểu 2 skill/hook/command nhóm tự viết, đặt ở `.agents/skills/` hoặc tương đương.)
+- `tools/smoke_p2.sh` — chạy trước khi gắn tag `phase-2` và sau mỗi lần gộp lát lớn: smoke hai tiến trình, `day` 1/2/5 Ngày, regression P1; tự ghi bằng chứng kèm commit.

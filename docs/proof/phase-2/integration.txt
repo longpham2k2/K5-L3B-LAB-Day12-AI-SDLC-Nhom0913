@@ -1,4 +1,4 @@
-# Smoke tích hợp hai tiến trình (TICKET-02 mục 5, phút 20) — 2026-11-21T04:27:18Z, commit 1dbeefd
+# Smoke tích hợp hai tiến trình (TICKET-02 mục 5, phút 20) — 2026-11-21T04:29:16Z, commit 9ce0e2b
 # Giỏ dùng cả 2 nguyên liệu mới (ca_keo, keo_neo); cập bến ở tick 0.
 --- dock.json
 {"gather":{"hold":["ca_loc","bong_sung","bong_sung","ca_keo","ca_keo","keo_neo"],"random_fish":false}}
