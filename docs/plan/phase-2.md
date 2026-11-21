@@ -12,9 +12,9 @@
 | AC-P2-03 | Gather: Cá Sấu M1/M2 (patrol/chase/recoil), `monster_hit`, bất tử 90 tick, rơi floor(n/2) LIFO, `faint` cause monster; thứ tự bước mục 4.5 | Long | AC-P2-01 | Xong (`tests/test_gather_monsters_p2.py`, 13 test) |
 | AC-P2-04 | Quán: B2, T2–T4, 6 món (test với số mới); tham số lọc menu theo kế hoạch ngày (`plan_dishes`) | Huy | AC-P2-01 | |
 | AC-P2-05 | Shop: `ShopSim` — `buy` oxygen/hp, `bought`/`buy_failed` (funds/max_level/unknown), `shop_done`, tự đóng sau 600 tick, `shop_end` | Huy | AC-P2-01 | |
-| AC-P2-06 | `--mode day`: chuỗi `day_start → day_plan → phase_start`, gather → quan → shop trong một tiến trình, giữ tiền/earned/uy tín/cấp qua Ngày, `active_upgrades` từ Ngày kế, `days_completed`, end `days_complete`, trường `day` trên event/snapshot | Duy | AC-P2-01; dùng sim của AC-P2-02..05 qua giao diện ở `docs/contracts/README.md` §5 | |
-| AC-P2-07 | Pause ở cả 3 mode (`paused`/`resumed`, chỉ tăng tick ngoài, `state:"paused"`) | Duy | AC-P2-06 | |
-| AC-P2-08 | Live/HUD: menu chính, DayIntro, EveningIntro, DayResult, Shop, Summary, pause; HUD mới (cần lấy/đã lấy, độ sâu, "Thủy quái!", "Hết hơi!", chữ ≥ 18 px) | Duy | AC-P2-06 | |
+| AC-P2-06 | `--mode day`: chuỗi `day_start → day_plan → phase_start`, gather → quan → shop trong một tiến trình, giữ tiền/earned/uy tín/cấp qua Ngày, `active_upgrades` từ Ngày kế, `days_completed`, end `days_complete`, trường `day` trên event/snapshot | Duy | AC-P2-01; dùng sim của AC-P2-02..05 qua giao diện ở `docs/contracts/README.md` §5 | Xong (runner/scenario/headless nối GatherSim v1.1 + QuanSim(plan_dishes, carry) + ShopSim thật qua §5; Session("shop") cho test AC-P2-05) — `docs/proof/phase-2/test-day-and-pause.txt` |
+| AC-P2-07 | Pause ở cả 3 mode (`paused`/`resumed`, chỉ tăng tick ngoài, `state:"paused"`) | Duy | AC-P2-06 | Xong (pause cả 3 mode; `docs/proof/phase-2/test-day-and-pause.txt`) |
+| AC-P2-08 | Live/HUD: menu chính, DayIntro, EveningIntro, DayResult, Shop, Summary, pause; HUD mới (cần lấy/đã lấy, độ sâu, "Thủy quái!", "Hết hơi!", chữ ≥ 18 px) | Duy | AC-P2-06 | Xong (`chonoi/live.py`, `chonoi/web/index.html`, `docs/proof/phase-2/test-live-p2.txt`, `hud-day.png`) |
 | AC-P2-09 | Smoke tích hợp phút 20 (`docs/proof/phase-2/integration.*`), smoke `day --days 1` và nhiều Ngày, regression P1 | Long | AC-P2-02..06 | |
 | AC-P2-10 | `docs/verification/phase-2.md`, retro P1+P2, clarify, ai-usage-log, standup | Duy (QA) + mọi người | Tất cả | |
 

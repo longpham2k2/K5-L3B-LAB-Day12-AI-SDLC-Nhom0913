@@ -50,8 +50,9 @@ def main(argv=None) -> int:
         if a.mode == "day" and not (1 <= (a.days if a.days is not None else 1) <= 5):
             raise BadInput("--days phải là số nguyên từ 1 đến 5")
         if a.mode == "day":
-            # TODO(Duy, AC-P2-06): bỏ dòng này khi runner có day (xem docs/contracts/README.md §5)
-            raise BadInput("--mode day đang được cài (AC-P2-06)")
+            days = a.days if a.days is not None else 1
+        else:
+            days = 1
         if a.ticks < 0:
             raise BadInput("--ticks phải >= 0")
         if a.snapshot_every <= 0:
@@ -77,7 +78,7 @@ def main(argv=None) -> int:
         return 2
     try:
         run(a.mode, tuning, scenario, a.seed, frames, a.ticks, a.out, a.snapshot_every,
-            inventory=inventory, inventory_out=a.inventory_out)
+            inventory=inventory, inventory_out=a.inventory_out, days=days)
     except BadInput as e:  # lỗi mức luật phát hiện lúc dựng sim
         sys.stderr.write(f"đầu vào sai: {e}\n")
         return 2

@@ -72,8 +72,8 @@ class Contract(unittest.TestCase):
     def test_con_03_old_and_future_modes_rejected(self):
         with Workdir() as w:
             out = w.path("o.jsonl")
-            for mode in ("river", "day"):
-                self.assertEqual(run_headless("--mode", mode, "--seed", "1", "--ticks", "0", "--out", out)[0], 2, mode)
+            # v1.1 (TICKET-02 mục 4.1): `day` đã được hỗ trợ (AC-P2-06); chế độ cũ `river` vẫn bị từ chối mã 2
+            self.assertEqual(run_headless("--mode", "river", "--seed", "1", "--ticks", "0", "--out", out)[0], 2, "river")
             self.assertFalse(os.path.exists(out))
             old = write_json(w.path("old.json"), {"river": {"hold": []}})
             self.assertEqual(run_headless("--mode", "gather", "--seed", "1", "--ticks", "0", "--scenario", old, "--out", out)[0], 2)

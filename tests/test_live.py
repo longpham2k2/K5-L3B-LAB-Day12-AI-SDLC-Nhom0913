@@ -83,6 +83,51 @@ class LiveServerTest(unittest.TestCase):
             self.assertIn("st.dish.dish_id", html_str)
             self.assertIn("c.reserved", html_str)
             self.assertIn("Kho khả dụng", html_str)
+            for marker in ("Thủy quái!", "Hết hơi!", "Tạm dừng", "Chợ Nâng Cấp", "Tổng kết hành trình"):
+                self.assertIn(marker, html_str)
+        finally:
+            server.stop()
+
+    def test_day_mode_pause_hold_and_shop_inputs(self):
+        tuning = load_contract()["tuning"]
+        scenario = {"day": {"money": 300, "earned": 300}, "gather": {"hold": ["ca_loc"]}, "quan": {"time_left_ticks": 1}}
+        server = LiveServer(LiveGame("day", tuning, scenario, 1, days=1), port=0)
+        server.start()
+        try:
+            base = f"http://127.0.0.1:{server.port}"
+            st0 = json.loads(_get(base + "/state")[1])
+            self.assertEqual(st0["mode"], "day")
+            self.assertEqual(st0["day"], 1)
+            self.assertIn("day_plan", st0)
+            self.assertIn("shop_meta", st0)
+            # Hold background loop (for intro overlays)
+            self.assertEqual(_post(base + "/hold", {"hold": True}), 200)
+            st_h1 = json.loads(_get(base + "/state")[1])
+            time.sleep(0.08)
+            st_h2 = json.loads(_get(base + "/state")[1])
+            self.assertEqual(st_h1["tick"], st_h2["tick"])
+            self.assertEqual(_post(base + "/hold", {"hold": False}), 200)
+            # Pause / resume / buy / shop_done accepted
+            self.assertEqual(_post(base + "/input", {"pause": True}), 200)
+            self.assertEqual(_post(base + "/input", {"pause": False}), 200)
+            self.assertEqual(_post(base + "/input", {"buy": "oxygen", "shop_done": False}), 200)
+            self.assertEqual(_post(base + "/input", {"buy": ""}), 400)
+        finally:
+            server.stop()
+
+    def test_day_hold_on_start_until_restart(self):
+        tuning = load_contract()["tuning"]
+        server = LiveServer(LiveGame("day", tuning, {}, 1, days=1, hold_on_start=True), port=0)
+        server.start()
+        try:
+            base = f"http://127.0.0.1:{server.port}"
+            time.sleep(0.06)
+            st0 = json.loads(_get(base + "/state")[1])
+            self.assertTrue(st0["ui_hold"])
+            self.assertEqual(st0["tick"], 0)
+            self.assertEqual(_post(base + "/restart", {}), 200)
+            st1 = json.loads(_get(base + "/state")[1])
+            self.assertFalse(st1["ui_hold"])
         finally:
             server.stop()
 

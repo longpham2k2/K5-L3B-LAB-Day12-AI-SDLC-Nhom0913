@@ -1,0 +1,11 @@
+# 2026-11-21T04:19:08Z base 288f3bf
+$ PYTHONPATH=tests:. python -m unittest tests.test_live -v
+test_day_hold_on_start_until_restart (tests.test_live.LiveServerTest.test_day_hold_on_start_until_restart) ... ok
+test_day_mode_pause_hold_and_shop_inputs (tests.test_live.LiveServerTest.test_day_mode_pause_hold_and_shop_inputs) ... ok
+test_quan_hud_state_and_html_fields (tests.test_live.LiveServerTest.test_quan_hud_state_and_html_fields) ... ok
+test_state_input_and_clean_stop (tests.test_live.LiveServerTest.test_state_input_and_clean_stop) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 2.433s
+
+OK
