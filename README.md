@@ -18,7 +18,7 @@ Cách làm việc kỹ thuật là **tự do** (push thẳng, nhánh + PR, pair,
 ```bash
 git clone <fork-của-nhóm> && cd <fork-của-nhóm>
 PYTHONPATH=tests:. python3 -m unittest discover -s tests -v        # smoke test
-python3 -m chonoi.live --mode gather                                # chơi thử trên trình duyệt (tùy chọn)
+python3 -m chonoi.live --mode day --days 5                          # chơi trọn vòng: Lặn & Hái → Quán → Shop, 5 Ngày (mở địa chỉ in ra)
 ```
 
 Game cần chế độ **headless** theo Test Contract (`python3 -m chonoi.headless --mode gather|quan …`) để được chạy và chấm tự động. **Công nghệ không ràng buộc**: khung Python trong `chonoi/` chỉ là gợi ý, chi tiết ở [`docs/STARTER.md`](docs/STARTER.md).
@@ -78,3 +78,9 @@ Hết giờ mỗi phase thì gắn tag rồi đi tiếp; chỗ chưa xong ghi tr
 
 - Dùng AI thoải mái; **không sao chép repo của nhóm khác**; bằng chứng phải thật.
 - Nhân vật, bối cảnh là bản gốc của lab; asset ngoài chỉ dùng CC0/CC-BY/MIT hoặc tự tạo, ghi nguồn trong `CREDITS.md`. Không commit API key, token, `.env`.
+
+## Sáng tạo của nhóm
+
+- **Hình vẽ tay theo phong cách PRD** (Phase 4, `chonoi/web/art.js`): Út Sen mặc áo bà ba, khăn rằn caro, kính lặn tự chế, giỏ lưới; cá linh (bạc, đốm sau mang), cá lóc (dài, loang), cá kèo (mắt lồi trên đỉnh đầu); Cá Sấu Năm Chèo có gai lưng, mõm răng, mắt đỏ khi đuổi; bông điên điển vàng, bông súng tím trên lá súng, kèo nèo lá xanh.
+- **Rong và đá đáy sông**: ảnh CC0 *Fish Pack 2.0* của Kenney (`chonoi/web/sprites.js`, `chonoi/web/assets/`, xem `CREDITS.md`).
+- **Lõi vẫn đúng:** sprite chỉ nạp trong cửa sổ chơi (`chonoi.live`); headless, JSONL và file kho không đổi. Ảnh chưa tải được thì cửa sổ tự vẽ hình khối như cũ; đặt `window.SPRITES_OFF = true` (vd. chế độ tương phản cao) để chỉ vẽ hình khối. Bằng chứng: toàn bộ bộ test xanh sau khi thêm sprite (`PYTHONPATH=tests:. python3 -m unittest discover -s tests`), và route `/assets/` chỉ nhận tên `[a-z0-9_].png` (đường dẫn `../` trả 404).

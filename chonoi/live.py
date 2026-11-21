@@ -12,6 +12,7 @@ Máy chủ HTTP nhỏ (ThreadingHTTPServer) phục vụ `chonoi/web/index.html` 
 import argparse
 import json
 import os
+import re
 import sys
 import threading
 import time
@@ -200,6 +201,14 @@ class _Handler(BaseHTTPRequestHandler):
         path = self.path.split("?", 1)[0]
         if path == "/state":
             self._send(200, self.game.state_json())
+        elif path in ("/sprites.js", "/art.js") or (path.startswith("/assets/") and re.fullmatch(r"/assets/[a-z0-9_]+\.png", path)):
+            # tài sản tĩnh của cửa sổ chơi; tên chỉ gồm [a-z0-9_] -> không thể đi ra ngoài thư mục web
+            ctype = "text/javascript; charset=utf-8" if path.endswith(".js") else "image/png"
+            try:
+                with open(os.path.join(WEB_DIR, *path.lstrip("/").split("/")), "rb") as f:
+                    self._send(200, f.read(), ctype)
+            except OSError:
+                self._send(404, b'{"error":"khong co"}')
         elif path in ("/", "/index.html"):
             try:
                 with open(os.path.join(WEB_DIR, "index.html"), "rb") as f:
