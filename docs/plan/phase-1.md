@@ -11,7 +11,7 @@
 | AC-P1-03 | Lát 3: khách đến theo lịch, chọn món nấu được, giữ chỗ nguyên liệu, kiên nhẫn, `customer_left`, `no_dish` | Huy | Hợp đồng kho (AC-P1-07) | Xong (`tests/test_quan_slice3.py`: khách đến/giữ chỗ, hết món, hết kiên nhẫn) |
 | AC-P1-04 | Lát 4: bếp (`cook_started`, `dish_ready`), bưng (`dish_picked`), phục vụ (`served`), ăn, trả tiền (`paid`), boa, uy tín, `quan_end` | Duy | AC-P1-03 (trường khách/đơn) | Xong (`tests/test_quan_slice4.py`) |
 | AC-P1-05 | HUD: buổi sáng (thời gian, oxy, Máu, giỏ); buổi tối (kho khả dụng, món gọi, kiên nhẫn, bếp, món trên tay, tiền, uy tín) | Duy | AC-P1-02, AC-P1-04 | Xong (`chonoi/web/index.html`, `docs/proof/phase-1/hud-quan.png`) |
-| AC-P1-06 | Ma trận truy vết `docs/verification/phase-1.md` + bằng chứng `docs/proof/phase-1/` | Duy | Tất cả | Chưa bắt đầu |
+| AC-P1-06 | Ma trận truy vết `docs/verification/phase-1.md` + bằng chứng `docs/proof/phase-1/` | Duy | Tất cả | Xong (`docs/verification/phase-1.md`, `docs/proof/phase-1/all-tests.txt`) |
 | AC-P1-07 | Hợp đồng kho `docs/contracts/` (schema + ví dụ), danh sách sự kiện, giao diện sim ↔ UI | Long | — | Xong (`docs/contracts/README.md`) |
 | AC-P1-08 | Chép đủ PRD-0 (mục F Quan, mục G) vào `docs/prd/phase-1.md`; câu hỏi mơ hồ vào `docs/clarify.md` | Long | — | Xong (`docs/prd/phase-1.md`) |
 | AC-P1-09 | README: chạy từ clone sạch ≤ 3 lệnh, điều khiển, cách tính điểm, lệnh test | Huy | AC-P1-02, AC-P1-04 | Xong (`README.md`: khởi động, điều khiển, headless, test, tính điểm) |
