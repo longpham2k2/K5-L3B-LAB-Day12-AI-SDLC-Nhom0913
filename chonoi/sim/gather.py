@@ -30,6 +30,15 @@ TICK = 60.0
 AXES = ("x", "d")
 
 
+def _reflect(v, lo, hi):
+    """Phản xạ phần quãng đường vượt mép; trả (vị trí, có đảo hướng không)."""
+    if v > hi:
+        return hi - (v - hi), True
+    if v < lo:
+        return lo + (lo - v), True
+    return v, False
+
+
 class GatherSim:
     mode = "gather"
     phase = "gather"
@@ -76,6 +85,7 @@ class GatherSim:
         self.money = 0
         self.earned = 0
         self.reputation = tuning["quan"]["reputation_initial"]
+        self.phase_tick = 0
         self.done = False
         self.reason = None
 
@@ -103,6 +113,7 @@ class GatherSim:
     def step(self, inp):
         events = []
         # 1. đồng hồ và hàng có sẵn: giảm bộ đếm, nút mọc lại
+        self.phase_tick += 1
         self.time_left_ticks = max(0, self.time_left_ticks - 1)
         self.invuln_ticks = max(0, self.invuln_ticks - 1)
         self.catch_cd_ticks = max(0, self.catch_cd_ticks - 1)
@@ -132,7 +143,44 @@ class GatherSim:
         # 5. hết giờ
         if self.time_left_ticks <= 0:
             self._finish("time", events)
+            return events
+        # 6. còn giờ: cá bơi, rồi sinh theo lịch (TICKET-02 mục 4.5). Bắt cá ở bước 4 dùng vị trí trước khi bơi.
+        if self.random_fish:
+            self._swim_fish()
+            self._spawn_on_schedule(events)
         return events
+
+    # --- cá bơi / sinh (TICKET-02 mục 1.1) ---------------------------------------
+    def _swim_fish(self):
+        t = self.t
+        step = float(t["fish_speed"]) / TICK
+        turn = int(t["fish_turn_ticks"])
+        xlo, xhi = (float(c) for c in t["fish_x"])
+        rng = self.rng.get("fish_turn")
+        for f in sort_by_id(self.fish):
+            n = f["age_ticks"] + 1  # bước bơi thứ n của đàn này
+            if n % turn == 0:
+                f["heading_deg"] = round(rng.random() * 360.0, 3)  # đổi hướng TRƯỚC khi di chuyển
+            h = math.radians(f["heading_deg"])
+            vx, vd = math.cos(h), math.sin(h)
+            dlo, dhi = (float(c) for c in t["fish_depths"][f["kind"]])
+            x, fx = _reflect(f["pos"][0] + vx * step, xlo, xhi)
+            d, fd = _reflect(f["pos"][1] + vd * step, dlo, dhi)
+            if fx or fd:
+                vx, vd = (-vx if fx else vx), (-vd if fd else vd)
+                f["heading_deg"] = round(math.degrees(math.atan2(vd, vx)) % 360.0, 3)
+            f["pos"] = [x, d]
+            f["age_ticks"] = n
+
+    def _spawn_on_schedule(self, events):
+        t = self.t
+        if self.phase_tick % int(t["fish_spawn_ticks"]) != 0 or len(self.fish) >= int(t["fish_max"]):
+            return
+        f = self._spawn_one()
+        if f is None:
+            return  # hết điểm hợp lệ: bỏ lượt
+        self.fish.append(f)  # tham gia bơi/bắt từ bước sau
+        events.append(("fish_spawned", {"id": f["id"], "kind": f["kind"], "pos": list(f["pos"])}))
 
     # --- tiện ích ---------------------------------------------------------------
     def _at_surface(self) -> bool:

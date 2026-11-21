@@ -8,8 +8,8 @@
 | ID | Việc | Người | Phụ thuộc | Trạng thái |
 |---|---|---|---|---|
 | AC-P2-01 | **Nền v1.1 (làm trước, phút 0–10):** `game.contract.json` 1.1 đủ khóa mục 4.1; `contract.py` kiểm 8 đàn / 3 loài / 3 loại nút; kho 6 nguyên liệu; `--mode day` + `--days` ở CLI; sửa test P1 dùng số cũ (ghi lý do) | Long | — | Xong (77/77 test; `docs/contracts/README.md` §5) |
-| AC-P2-02 | Gather: N5/N6 kèo nèo, cá kèo; cá bơi (1.5 m/s, đổi hướng mỗi 120 bước, phản xạ mép), sinh cá mỗi 360 tick (`fish_spawned`), `age_ticks` | Long | AC-P2-01 | Đang làm |
-| AC-P2-03 | Gather: Cá Sấu M1/M2 (patrol/chase/recoil), `monster_hit`, bất tử 90 tick, rơi floor(n/2) LIFO, `faint` cause monster; thứ tự bước mục 4.5 | Long | AC-P2-01 | |
+| AC-P2-02 | Gather: N5/N6 kèo nèo, cá kèo; cá bơi (1.5 m/s, đổi hướng mỗi 120 bước, phản xạ mép), sinh cá mỗi 360 tick (`fish_spawned`), `age_ticks` | Long | AC-P2-01 | Xong (`tests/test_gather_fish_p2.py`, 10 test) |
+| AC-P2-03 | Gather: Cá Sấu M1/M2 (patrol/chase/recoil), `monster_hit`, bất tử 90 tick, rơi floor(n/2) LIFO, `faint` cause monster; thứ tự bước mục 4.5 | Long | AC-P2-01 | Đang làm |
 | AC-P2-04 | Quán: B2, T2–T4, 6 món (test với số mới); tham số lọc menu theo kế hoạch ngày (`plan_dishes`) | Huy | AC-P2-01 | |
 | AC-P2-05 | Shop: `ShopSim` — `buy` oxygen/hp, `bought`/`buy_failed` (funds/max_level/unknown), `shop_done`, tự đóng sau 600 tick, `shop_end` | Huy | AC-P2-01 | |
 | AC-P2-06 | `--mode day`: chuỗi `day_start → day_plan → phase_start`, gather → quan → shop trong một tiến trình, giữ tiền/earned/uy tín/cấp qua Ngày, `active_upgrades` từ Ngày kế, `days_completed`, end `days_complete`, trường `day` trên event/snapshot | Duy | AC-P2-01; dùng sim của AC-P2-02..05 qua giao diện ở `docs/contracts/README.md` §5 | |

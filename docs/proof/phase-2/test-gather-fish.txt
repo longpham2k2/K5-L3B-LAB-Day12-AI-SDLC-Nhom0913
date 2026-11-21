@@ -1,0 +1,17 @@
+# 2026-11-21T03:53:26Z base 9704d86 — AC-P2-02 cá bơi/sinh
+test_default_start_has_8_then_spawns_at_360 (tests.test_gather_fish_p2.Spawn.test_default_start_has_8_then_spawns_at_360) ... ok
+test_deterministic_per_seed (tests.test_gather_fish_p2.Spawn.test_deterministic_per_seed) ... ok
+test_no_spawn_at_cap (tests.test_gather_fish_p2.Spawn.test_no_spawn_at_cap) ... ok
+test_catch_uses_position_before_swim (tests.test_gather_fish_p2.Swim.test_catch_uses_position_before_swim)
+Đàn đang bơi ra xa đúng mép bán kính: bắt ở bước này vẫn trúng vì xét vị trí trước khi bơi. ... ok
+test_corner_flips_both (tests.test_gather_fish_p2.Swim.test_corner_flips_both) ... ok
+test_heading_changes_on_swim_step_120_before_moving (tests.test_gather_fish_p2.Swim.test_heading_changes_on_swim_step_120_before_moving) ... ok
+test_random_fish_false_keeps_fixture_still (tests.test_gather_fish_p2.Swim.test_random_fish_false_keeps_fixture_still) ... ok
+test_reflect_depth_band_of_species (tests.test_gather_fish_p2.Swim.test_reflect_depth_band_of_species) ... ok
+test_reflect_x_edge_and_flip_heading (tests.test_gather_fish_p2.Swim.test_reflect_x_edge_and_flip_heading) ... ok
+test_swims_at_fish_speed_and_counts_age (tests.test_gather_fish_p2.Swim.test_swims_at_fish_speed_and_counts_age) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.661s
+
+OK
