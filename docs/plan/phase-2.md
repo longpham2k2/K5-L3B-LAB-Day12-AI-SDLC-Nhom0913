@@ -16,7 +16,7 @@
 | AC-P2-07 | Pause ở cả 3 mode (`paused`/`resumed`, chỉ tăng tick ngoài, `state:"paused"`) | Duy | AC-P2-06 | Xong (pause cả 3 mode; `docs/proof/phase-2/test-day-and-pause.txt`) |
 | AC-P2-08 | Live/HUD: menu chính, DayIntro, EveningIntro, DayResult, Shop, Summary, pause; HUD mới (cần lấy/đã lấy, độ sâu, "Thủy quái!", "Hết hơi!", chữ ≥ 18 px) | Duy | AC-P2-06 | Xong (`chonoi/live.py`, `chonoi/web/index.html`, `docs/proof/phase-2/test-live-p2.txt`, `hud-day.png`) |
 | AC-P2-09 | Smoke tích hợp phút 20 (`docs/proof/phase-2/integration.*`), smoke `day --days 1` và nhiều Ngày, regression P1 | Long | AC-P2-02..06 | Xong (`bash tools/smoke_p2.sh` → `docs/proof/phase-2/integration.txt`, `day-smoke.txt`, `regression-p1.txt`; 11/11 kiểm tra đạt) |
-| AC-P2-10 | `docs/verification/phase-2.md`, retro P1+P2, clarify, ai-usage-log, standup | Duy (QA) + mọi người | Tất cả | |
+| AC-P2-10 | `docs/verification/phase-2.md`, retro P1+P2, clarify, ai-usage-log, standup | Duy (QA) + mọi người | Tất cả | Xong (`docs/verification/phase-2.md`, `docs/retro.md`, `docs/standup.md`, `docs/clarify.md` #19–#25, `docs/ai-usage-log.md`, `docs/proof/phase-2/all-tests.txt` — 118/118 OK) |
 
 ## Mốc trong phase
 
