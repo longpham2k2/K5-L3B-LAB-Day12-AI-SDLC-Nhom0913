@@ -526,5 +526,27 @@ class FullCycleAndScenarioValidation(unittest.TestCase):
                 self.assertFalse(os.path.exists(out), f"case {idx} không được tạo file out")
 
 
+class AssignedFixturePrice(unittest.TestCase):
+    """PRD-0 mục F-Quán bước 3: giá chốt khi bắt đầu nấu, nên đơn `assigned` trong fixture được khai `base_price`
+    (khớp payload món). Trước đây bị mã 2 nhầm. Boa chỉ chốt lúc phục vụ -> khách chưa ăn không được có tip > 0."""
+
+    COOKING = {"id": "B1", "state": "cooking", "cook_ticks_left": 10,
+               "dish": {"order_id": "C1", "dish_id": "ca_loc_nuong_trui", "base_price": 60}}
+
+    def _code(self, w, customer):
+        block = {"stock": {}, "random_customers": False, "stoves": [self.COOKING], "customers": [customer]}
+        sc = write_json(w.path("sc.json"), {"quan": block})
+        return run_headless("--mode", "quan", "--seed", "1", "--ticks", "0", "--scenario", sc,
+                            "--out", w.path("o.jsonl"))[0]
+
+    def test_assigned_customer_may_declare_matching_base_price(self):
+        base = {"id": "C1", "table_id": "T1", "dish_id": "ca_loc_nuong_trui", "order_status": "assigned"}
+        with Workdir() as w:
+            self.assertEqual(self._code(w, dict(base, base_price=60)), 0)
+            self.assertEqual(self._code(w, dict(base, base_price=60, tip=0)), 0)
+            self.assertEqual(self._code(w, dict(base, base_price=61)), 2, "giá khác payload món trên bếp")
+            self.assertEqual(self._code(w, dict(base, base_price=60, tip=12)), 2, "boa chưa chốt khi chưa phục vụ")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -218,8 +218,12 @@ class QuanSim:
                 if not _is_nonneg_int(pat_left) or pat_left > patience_max:
                     raise BadInput(f"customers.{cid}.patience_ticks_left phải trong [0, {patience_max}]")
                 bp, tip = c.get("base_price"), c.get("tip")
-                if bp is not None or tip is not None:
-                    raise BadInput(f"customers.{cid}: khách waiting chưa được chốt base_price/tip")
+                # Giá chốt khi bắt đầu nấu (F-Quán bước 3) -> đơn assigned được khai base_price (khớp món, kiểm ở
+                # _validate_cross_state). Boa chỉ chốt lúc phục vụ -> khách chưa ăn chỉ được tip vắng/null/0.
+                if bp is not None and (order_status != "assigned" or not _is_pos_int(bp)):
+                    raise BadInput(f"customers.{cid}: chỉ đơn assigned mới được khai base_price (số nguyên dương)")
+                if tip not in (None, 0) or isinstance(tip, bool):
+                    raise BadInput(f"customers.{cid}: khách waiting chưa được chốt boa")
                 if "reserved" in c:
                     reserved = validate_items(c["reserved"])
                     if order_status == "reserved":
@@ -292,6 +296,8 @@ class QuanSim:
                 raise BadInput(f"đơn {oid} có món nhưng trạng thái không phải waiting/assigned")
             if dish["dish_id"] != c["dish_id"]:
                 raise BadInput(f"món {dish['dish_id']} không khớp món khách {oid} gọi ({c['dish_id']})")
+            if c["base_price"] is not None and c["base_price"] != dish["base_price"]:
+                raise BadInput(f"đơn {oid}: base_price {c['base_price']} khác giá món đã chốt {dish['base_price']}")
 
         for c in self.customers:
             has_dish = c["id"] in dishes_by_order

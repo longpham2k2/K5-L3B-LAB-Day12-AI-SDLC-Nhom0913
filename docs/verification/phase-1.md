@@ -18,6 +18,9 @@
 ## Đánh giá ngắn
 - **Yêu cầu đạt:** Toàn bộ phần lõi Phase 1 (`gather`, `quan`, hợp đồng file kho, Test Contract v1.0, tất định từng byte, kiểm mâu thuẫn scenario mã thoát 2, HUD buổi sáng & buổi tối, smoke hai tiến trình) đạt **77/77 test** trên `main`.
 - **Ghi chú trung thực:** Nhóm thực tế có 3 thành viên (`longpham2k2`, `HyperSyst`, `tran85122-afk`), đã khai `team_size: 3` khớp `TEAM.md` và ghi nhận trong `docs/clarify.md` #1.
+- **Lệnh kiểm chứng đầy đủ:** các lệnh `python -m unittest ...` ở bảng cần chạy từ gốc repo dạng `PYTHONPATH=tests:. python3 -m unittest <module> -v`.
+- **Giả định chưa xác nhận:** một số kết quả Quán dựa trên giả định #2–#18 trong `docs/clarify.md` (chưa hỏi được Anh Năm).
+- **Rủi ro đã biết lúc gắn tag `phase-1`:** fixture đơn `assigned` khai `base_price` bị mã 2 nhầm. Đã sửa ở Phase 2 (test `AssignedFixturePrice` trong `tests/test_quan_slice4.py`).
 - **Điều cần chỉnh cho phase sau:**
   - Khi gộp `chonoi/sim/quan.py` giữa Lát 3 và Lát 4 đã phát hiện sớm lệch nhỏ ở `chonoi/scenario.py` (kiểm `reserved == recipe` cho mọi khách `waiting`) nhờ bộ test hộp đen; ở Phase 2 nên chạy full `unittest discover` ngay trên nhánh trước khi push vào `main`.
   - Chuẩn bị sẵn kiến trúc cho chế độ `day` (nối `gather` → `quan` trong cùng tiến trình) và `burn_s` / cá di chuyển ở Phase 2.
