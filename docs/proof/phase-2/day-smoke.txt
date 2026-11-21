@@ -1,8 +1,8 @@
-# Smoke --mode day (TICKET-02 mục 5, phút 35–45) — 2026-11-21T04:29:16Z, commit 9ce0e2b
+# Smoke --mode day (TICKET-02 mục 5, phút 35–45) — 2026-11-21T04:39:32Z, commit 21b15ef
 
 ## 2a. day --days 1, không điều khiển: một Ngày tối đa 22.200 tick, chạy ≤ 20 s
 exit=0
-thời gian chạy: 0.41 s
+thời gian chạy: 0.36 s
 {"type":"event","tick":0,"phase":"gather","name":"day_start","data":{},"day":1}
 {"type":"event","tick":0,"phase":"gather","name":"day_plan","data":{"dishes":{"ca_loc_nuong_trui":3,"goi_bong_sung":3},"ingredients":{"bong_sung":6,"ca_loc":3}},"day":1}
 {"type":"event","tick":0,"phase":"gather","name":"phase_start","data":{},"day":1}

@@ -24,6 +24,6 @@
 - [ ] Nhãn `phase-2`: chuẩn bị gắn trên commit bàn giao của `main` sau khi push phần `AC-P2-10` này.
 
 ## Lý do cập nhật test Phase 1 sang v1.1
-- **`fish_initial` 6 → 8 đàn:** PRD v1.1 đổi số đàn đầu ca từ 6 lên 8; cập nhật kiểm tra `fish` trong [`tests/test_gather_slice2.py`](../../tests/test_gather_slice2.py) / [`tests/test_smoke_p1.py`](../../tests/test_smoke_p1.py) khớp Contract v1.1.
+- **`fish_initial` 6 → 8 đàn:** PRD v1.1 đổi số đàn đầu ca từ 6 lên 8; cập nhật kiểm tra `fish` trong [`tests/test_smoke_p1.py`](../../tests/test_smoke_p1.py) khớp Contract v1.1 (`tests/test_gather_slice2.py` không phải đổi).
 - **`attack` và `photo` không còn bị coi là nút lạ:** PRD v1.1 mục 4.2 quy định nút mở rộng hợp lệ khi chưa bật mở rộng thì bị bỏ qua (không thoát mã 2); cập nhật [`tests/test_python_starter_units.py`](../../tests/test_python_starter_units.py) (ghi chú tại [`docs/clarify.md`](../clarify.md) #21).
 - **`--mode day` đã được hỗ trợ:** bỏ `"day"` khỏi danh sách mode bị từ chối ở `test_con_03_old_and_future_modes_rejected` trong [`tests/test_smoke_p1.py`](../../tests/test_smoke_p1.py), vẫn giữ kiểm tra từ chối `"river"` và các mode cũ.
