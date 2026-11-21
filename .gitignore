@@ -2,5 +2,6 @@ __pycache__/
 *.pyc
 *.jsonl
 !tests/fixtures/*.jsonl
+dist/
 .DS_Store
 dist/

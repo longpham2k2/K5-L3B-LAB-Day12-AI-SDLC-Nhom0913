@@ -28,6 +28,7 @@
 - Sáng tạo thêm được khuyến khích nhưng phải tắt ở headless (xem README, mục "Tự do sáng tạo").
 
 ## Skills / hooks của nhóm
-- (Ghi tên và khi nào dùng; tối thiểu 2 skill/hook/command nhóm tự viết, đặt ở `.agents/skills/` hoặc tương đương.)
 - `tools/package_release.sh [ref] [version]` — đóng gói Release bằng `git archive` rồi tự chạy toàn bộ test trong bản giải nén (dùng trước khi công bố v1.0.0).
 - `tools/smoke_p2.sh` — chạy trước khi gắn tag `phase-2` và sau mỗi lần gộp lát lớn: smoke hai tiến trình, `day` 1/2/5 Ngày, regression P1; tự ghi bằng chứng kèm commit.
+- `tools/smoke_p3.sh` — kiểm tra kho cá thể v1.2, bàn giao file/day và regression P1–P2 trước khi gộp hoặc phát hành.
+- `.githooks/pre-push` — chặn push khi `unittest discover -s tests` lỗi. Mỗi clone cài một lần bằng `chmod +x .githooks/pre-push && git config core.hooksPath .githooks`; có thể đặt `PYTHON_BIN` khi `python3` không có trên PATH.

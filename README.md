@@ -23,6 +23,38 @@ python3 -m chonoi.live --mode day --days 5                          # chơi tr�
 
 Game cần chế độ **headless** theo Test Contract (`python3 -m chonoi.headless --mode gather|quan …`) để được chạy và chấm tự động. **Công nghệ không ràng buộc**: khung Python trong `chonoi/` chỉ là gợi ý, chi tiết ở [`docs/STARTER.md`](docs/STARTER.md).
 
+## Bản phát hành v1.0.0
+
+Yêu cầu: Python 3.10+ (chỉ dùng standard library) và trình duyệt hiện đại để chơi giao diện. Không cần cài package ngoài.
+
+Từ macOS/Linux clone sạch, mở game trong tối đa ba lệnh:
+
+```bash
+git clone https://github.com/longpham2k2/K5-L3B-LAB-Day12-AI-SDLC-Nhom0913.git chonoi
+cd chonoi
+python3 -m chonoi.live --mode gather
+```
+
+Lệnh cuối in địa chỉ local để mở trong trình duyệt. Dừng server bằng `Ctrl+C`.
+
+### Kiểm tra và công cụ phát hành
+
+```bash
+# Regression
+PYTHONPATH=tests:. python3 -m unittest discover -s tests -v
+
+# Một Ngày headless và hai công cụ contract v1.3
+python3 -m chonoi.headless --mode day --seed 1 --days 1 --ticks 40000 --out day.jsonl
+python3 -m chonoi.bench --seed 42 --duration 30 --out bench.json
+python3 -m chonoi.soak --seed 7 --days 10 --out soak.json
+```
+
+Để bật kiểm tra trước mỗi lần push trong clone của bạn:
+
+```bash
+chmod +x .githooks/pre-push && git config core.hooksPath .githooks
+```
+
 ### Điều khiển
 
 - **WASD** hoặc **phím mũi tên**: di chuyển.

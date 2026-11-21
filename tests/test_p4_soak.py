@@ -2,7 +2,9 @@
 
 import json
 import shlex
+import shutil
 import subprocess
+import sys
 import unittest
 
 from chonoi.contract import load_contract
@@ -15,6 +17,14 @@ from helpers import ROOT, Workdir
 with open("game.contract.json", encoding="utf-8") as _f:
     C = json.load(_f)
 TUNING = load_contract()["tuning"]
+
+
+def contract_command(name):
+    """Giữ manifest chuẩn `python3`, nhưng chạy test được trên Windows không có alias đó."""
+    command = shlex.split(C[name])
+    if command[0] == "python3" and shutil.which("python3") is None:
+        command[0] = sys.executable
+    return command
 
 
 class Manifest13(unittest.TestCase):
@@ -49,14 +59,14 @@ class Soak(unittest.TestCase):
     def test_cli_writes_soak_json(self):
         with Workdir() as w:
             out = w.path("soak.json")
-            cmd = shlex.split(C["soak_cmd"]) + ["--seed", "7", "--days", "1", "--out", out]
+            cmd = contract_command("soak_cmd") + ["--seed", "7", "--days", "1", "--out", out]
             p = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
             self.assertEqual(p.returncode, 0, p.stderr)
             with open(out, encoding="utf-8") as f:
                 r = json.load(f)
             self.assertEqual(set(r), {"days", "days_completed", "crashes", "results", "duration_s"})
             self.assertEqual((r["days_completed"], r["crashes"]), (1, 0))
-            bad = subprocess.run(shlex.split(C["soak_cmd"]) + ["--seed", "7", "--days", "0", "--out", out],
+            bad = subprocess.run(contract_command("soak_cmd") + ["--seed", "7", "--days", "0", "--out", out],
                                  cwd=ROOT, capture_output=True, text=True)
             self.assertEqual(bad.returncode, 2)
 

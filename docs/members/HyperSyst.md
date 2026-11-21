@@ -1,11 +1,6 @@
 # HyperSyst — phản tư cá nhân (≤ 200 từ)
 
-- **Tôi đã làm (kèm link commit):**
-  - Làm Lát 3 `sim/quan`: khách đến theo lịch, chọn món còn nguyên liệu, giữ chỗ `reserved`, kiên nhẫn, `customer_left`, `no_dish` và trạng thái `unfulfillable`; viết 7 test tại `tests/test_quan_slice3.py` ([`7e426f8`](https://github.com/longpham2k2/K5-L3B-LAB-Day12-AI-SDLC-Nhom0913/commit/7e426f8), [`62ebe41`](https://github.com/longpham2k2/K5-L3B-LAB-Day12-AI-SDLC-Nhom0913/commit/62ebe41)).
-  - Cập nhật hướng dẫn README và bằng chứng cho AC-P1-03/AC-P1-09.
-- **Tôi đã review (kèm link):**
-  - Đối chiếu trường khách/đơn, event và thứ tự bước của Lát 3 với `docs/contracts/README.md` và PRD trước khi sửa vòng cuối ([`62ebe41`](https://github.com/longpham2k2/K5-L3B-LAB-Day12-AI-SDLC-Nhom0913/commit/62ebe41)).
-- **AI sai ở đâu và tôi phát hiện thế nào:**
-  - Bản đầu có test xanh nhưng snapshot xử lý sai nguyên liệu đã giữ chỗ, event có trường thừa và thứ tự khách rời chưa đúng. Tôi đối chiếu từng payload với PRD, thêm test cho closing, cấp phát theo `(order_tick, table_id)` và fixture không đủ kho.
-- **Điều tôi học được:**
-  - Test đơn vị xanh chưa đủ; phải kiểm hợp đồng liên module, thứ tự event và trạng thái kho quan sát được.
+- Tôi làm logic Quán P1/P2 và chuyển kho Quán sang cá thể ở P3: hao `1/240`/tick, `spoiled`, giữ theo id tươi nhất và giữ lại khi ươn ([`9bb69d0`](https://github.com/longpham2k2/K5-L3B-LAB-Day12-AI-SDLC-Nhom0913/commit/9bb69d0)). Tôi cũng rà đóng gói P4: README, CREDITS/LICENSE, artifact zip và hook pre-push.
+- Tôi hỗ trợ tích hợp bằng cách đối chiếu event/snapshot Quán với PRD và test lại từ worktree sạch.
+- AI từng báo xong P3 khi commit `8a0fbfc` chỉ có test. Tôi dùng `git show --stat`, thấy thiếu `quan.py`, rồi khôi phục và push commit đúng.
+- Bài học: kết quả test chỉ đáng tin khi commit, diff staged và bản clone/package cùng chứa thay đổi; hook phải được version hóa, không chỉ ghi trong retro.
