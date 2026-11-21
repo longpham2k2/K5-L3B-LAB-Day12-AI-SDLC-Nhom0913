@@ -58,10 +58,11 @@ class QuanSim:
     mode = "quan"
     phase = "quan"
 
-    def __init__(self, tuning, scenario, streams, ids, inventory=None):
+    def __init__(self, tuning, scenario, streams, ids, inventory=None, *, plan_dishes=None, carry=None):
         t = tuning["quan"]
         self.t = t
         self.menu = tuning["menu"]
+        self.plan_dishes = self._init_plan_dishes(plan_dishes)
         self.rng = streams
         self.ids = ids
         p = scenario.get("player", {})
@@ -81,7 +82,12 @@ class QuanSim:
             raise BadInput("random_customers phải là boolean")
         self.random_customers = rc
 
-        rep = scenario.get("reputation", t["reputation_initial"])
+        carried = self._init_carry(carry)
+        if carried is None:
+            money, earned = 0, 0
+            rep = scenario.get("reputation", t["reputation_initial"])
+        else:
+            money, earned, rep = carried
         if not _is_num(rep) or not (t["reputation_min"] <= rep <= t["reputation_max"]):
             raise BadInput("reputation nằm ngoài [reputation_min, reputation_max]")
         self._rep_dec = Decimal(str(rep))
@@ -96,11 +102,37 @@ class QuanSim:
 
         for e in self.customers:
             ids.reserve(e["id"])
-        self.money = 0
-        self.earned = 0
+        self.money = money
+        self.earned = earned
         self.shift_earned = 0
         self.done = False
         self.reason = None
+
+    def _init_plan_dishes(self, plan_dishes):
+        """Danh sách món của ngày: lọc menu trước khi xét kho khả dụng."""
+        if plan_dishes is None:
+            return None
+        if not isinstance(plan_dishes, list) or not all(isinstance(d, str) for d in plan_dishes):
+            raise BadInput("plan_dishes phải là mảng id món")
+        if len(set(plan_dishes)) != len(plan_dishes):
+            raise BadInput("plan_dishes không được lặp id món")
+        unknown = sorted(set(plan_dishes) - set(self.menu))
+        if unknown:
+            raise BadInput(f"plan_dishes có món không có trong menu: {unknown}")
+        return frozenset(plan_dishes)
+
+    def _init_carry(self, carry):
+        """Trạng thái xuyên Ngày do DaySim bàn giao; None nghĩa là ca độc lập."""
+        if carry is None:
+            return None
+        if not isinstance(carry, dict) or set(carry) != {"money", "earned", "reputation"}:
+            raise BadInput("carry phải có đúng money, earned, reputation")
+        money, earned, rep = carry["money"], carry["earned"], carry["reputation"]
+        if not _is_nonneg_int(money) or not _is_nonneg_int(earned) or money > earned:
+            raise BadInput("carry cần 0 <= money <= earned (số nguyên)")
+        if not _is_num(rep):
+            raise BadInput("carry.reputation phải là số hữu hạn")
+        return money, earned, rep
 
     @staticmethod
     def _merge(defaults, updates, allowed_keys, bounds):
@@ -568,6 +600,8 @@ class QuanSim:
         available = self._available_stock()
         cookable = []
         for dish_id in sorted(self.menu):
+            if self.plan_dishes is not None and dish_id not in self.plan_dishes:
+                continue
             recipe = self.menu[dish_id].get("recipe", {})
             if all(int(available.get(item, 0)) >= int(amount) for item, amount in recipe.items()):
                 cookable.append(dish_id)

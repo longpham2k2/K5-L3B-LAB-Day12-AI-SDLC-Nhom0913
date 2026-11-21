@@ -16,12 +16,21 @@ from .jsonl import JsonlWriter
 from .rng import Streams
 from .sim.gather import GatherSim
 from .sim.quan import QuanSim
+from .sim.shop import ShopSim
 
 
 def build_sim(mode, tuning, scenario, seed, inventory):
     streams, ids = Streams(seed), IdAllocator()
     if mode == "gather":
         return GatherSim(tuning, scenario, streams, ids)
+    if mode == "shop":
+        carry = scenario.get("carry", {
+            "money": 0,
+            "earned": 0,
+            "reputation": tuning["quan"]["reputation_initial"],
+        })
+        return ShopSim(tuning, stock=scenario.get("stock", {}), carry=carry,
+                       upgrades=scenario.get("upgrades", {}))
     return QuanSim(tuning, scenario, streams, ids, inventory=inventory)
 
 
