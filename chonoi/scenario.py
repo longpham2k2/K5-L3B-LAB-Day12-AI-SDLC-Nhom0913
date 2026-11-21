@@ -146,6 +146,8 @@ def _validate_quan(b, tuning):
             _check_ids(arr, b[arr])
     if "stock" in b:
         validate_items(b["stock"])
+    if "random_customers" in b and not isinstance(b["random_customers"], bool):
+        raise BadInput("random_customers phải là boolean")
     p = b.get("player", {})
     if not isinstance(p, dict) or set(p) - QUAN_PLAYER_KEYS:
         raise BadInput("quan.player chỉ có pos và vel")
@@ -159,5 +161,17 @@ def _validate_quan(b, tuning):
     for c in b.get("customers", []):
         if not isinstance(c.get("table_id"), str) or c["table_id"] not in known:
             raise BadInput(f"customers.{c['id']}: table_id phải là bàn có thật")
+        if "dish_id" in c:
+            if c["dish_id"] is not None and c["dish_id"] not in tuning["menu"]:
+                raise BadInput(f"customers.{c['id']}: dish_id không có trong menu")
+        if "state" in c and c["state"] not in ("waiting", "eating"):
+            raise BadInput(f"customers.{c['id']}: state phải là waiting hoặc eating")
+        if "patience_ticks_left" in c:
+            _nonneg_int(f"customers.{c['id']}.patience_ticks_left", c["patience_ticks_left"])
+        if "reserved" in c:
+            try:
+                validate_items(c["reserved"])
+            except BadInput as e:
+                raise BadInput(f"customers.{c['id']}.reserved: {e}")
     if len(table_ids) != len(set(table_ids)):
         raise BadInput("hai khách cùng bàn")
