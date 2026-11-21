@@ -20,5 +20,8 @@
 | 16 | 2026-11-21 | (P1) Mục "Mở rộng" không liệt kê mục nào cho Phase 1. | Không ảnh hưởng nhóm 3 người; hỏi giảng viên danh sách áp dụng ở phase nào. | Long (PO) hỏi giảng viên |
 | 17 | 2026-11-21 | (P3) HUD cần "kho khả dụng" nhưng snapshot `stock` là tồn vật lý (gồm phần giữ). | **Quyết định:** snapshot giữ tồn vật lý theo mục D; UI tự tính khả dụng = `stock − Σ reserved`. | Long (Integrator) |
 | 18 | 2026-11-21 | (P4) `money` / `earned` / `shift_earned` khác nhau thế nào ở Phase 1 (chưa có chi tiêu)? | **Giả định:** Phase 1 cả ba bằng nhau; khác biệt để dành cho phase sau. | Nhóm tự giả định |
+| 19 | 2026-11-21 (P2) | `fish_initial` "là số 8" — 8 đàn đầu ca chọn thế nào? | **Giả định:** lặp 8 lần đúng thuật toán sinh cá (loài theo trọng số chuẩn hóa trên loài còn điểm cách mọi đàn > 1 m, chọn đều điểm, hướng theo seed), luồng RNG `fish_spawn`, id F1–F8. | Long |
+| 20 | 2026-11-21 (P2) | "Hướng ban đầu theo seed" — góc liên tục hay rời rạc? | **Giả định:** góc đều trong [0, 360) độ, làm tròn 3 chữ số. | Long |
+| 21 | 2026-11-21 (P2) | `attack`/`photo` khi chưa bật mở rộng: mã 2 hay bỏ qua? | **Quyết định:** theo mục 4.2 "mở rộng chưa bật thì bỏ qua" → nút hợp lệ, bị bỏ qua. Đã sửa test P1 (trước coi `attack` là nút lạ). | Long |
 
 > **Cách làm khi chưa hỏi được Anh Năm:** làm trước phần PRD đã rõ; chỗ mơ hồ cài theo giả định trên, viết test ghi rõ "giả định #n", để dễ sửa khi có câu trả lời. Có trả lời thì cập nhật cột "Trả lời / giả định" và ghi giờ.

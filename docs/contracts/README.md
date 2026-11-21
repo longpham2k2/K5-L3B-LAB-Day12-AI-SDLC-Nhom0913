@@ -46,3 +46,21 @@ Nguồn: PRD-0 mục D, E, G (`docs/prd/phase-1.md`). Đổi hợp đồng: báo
 ## 4. Ranh giới lát 3 ↔ lát 4 trong `chonoi/sim/quan.py`
 
 Khách là dict theo mục D. Lát 3 (Huy) sở hữu: sinh khách, chọn món, `reserved`, giảm `patience_ticks_left`, khách rời. Lát 4 (Duy) sở hữu: bếp, `hand`, `served`, ăn, trả tiền, boa, uy tín, `quan_end`. Khi đơn chuyển trạng thái (`reserved → assigned → served`), lát 4 đổi `order_status`; lát 3 chỉ đọc. Thứ tự trong `step()` theo PRD mục F "Quán" bước 1→5.
+
+## 5. Phase 2 (v1.1) — giao diện sim ↔ `day` (chốt bởi Long, phút 0–10)
+
+Mục tiêu: Huy (quán, Shop), Long (gather) và Duy (`day`, pause, HUD) làm song song; `day` chỉ gọi các sim qua giao diện dưới đây, không đọc ruột sim.
+
+**Mọi sim** (`GatherSim`, `QuanSim`, `ShopSim`) có: `phase` (`"gather"|"quan"|"shop"`), `step(inp) -> [(name, data), ...]`, `snapshot() -> dict` (phần riêng của pha), `done`, `reason`, `time_left_ticks`, `money`, `earned`, `reputation`. `inp` là `chonoi.inputs.InputState` (có `move`, `pressed(name)`, `buy`).
+
+| Sim | Tham số thêm cho `day` (từ khóa, mặc định = chạy độc lập) | Ai |
+|---|---|---|
+| `GatherSim(tuning, scenario, streams, ids, *, day=1, active_upgrades=None)` | `day` chọn bố trí Cá Sấu (`from_day`); `active_upgrades` = `{"oxygen": n, "hp": n}` đổi `oxygen_max`/`hp_max` theo `tuning.shop.upgrades`. Kết quả bàn giao: `inventory_items()` | Long |
+| `QuanSim(tuning, scenario, streams, ids, inventory=None, *, plan_dishes=None, carry=None)` | `plan_dishes` = list id món của kế hoạch Ngày (lọc menu TRƯỚC khi lọc nguyên liệu); `carry` = `{"money", "earned", "reputation"}` đầu ca (mặc định 0, 0, `reputation_initial`). `shift_earned` luôn bắt đầu 0. Kho dư sau ca: `stock` | Huy |
+| `ShopSim(tuning, *, stock, carry, upgrades)` | `stock` = kho dư sau quán (chỉ để snapshot); `carry` như trên; `upgrades` = cấp **đã mua** `{"oxygen": n, "hp": n}`, ShopSim sửa tại chỗ khi `bought`. `time_left_ticks` = `shop.max_ticks` | Huy |
+
+**`day` (Duy)** giữ trạng thái xuyên Ngày: `money`, `earned`, `reputation`, `upgrades` (đã mua), `active_upgrades` (sao từ `upgrades` CHỈ khi dựng Ngày mới), `days_completed`. Sau mỗi pha đọc `money/earned/reputation` của sim cũ làm `carry` cho sim mới. Thứ tự event và vỏ event (`day` trên mọi event, `phase_start`, `day_plan`…) theo `docs/prd/phase-2.md` mục 4.4–4.5.
+
+**Inputs v1.1** (đã có trong `chonoi/inputs.py`): nút `interact, catch, pause, shop_done, attack, photo`; `inp.buy` là chuỗi chỉ ở đúng frame khai báo, ngược lại `None`. Pause xử lý ở `day`/runner, sim không thấy bước pause.
+
+**Dữ liệu v1.1** ở `game.contract.json`: `tuning.day_plan[]`, `tuning.shop`, `tuning.gather.monsters`, khóa cá mới, 6 món, B1–B2, T1–T4. Kho: 6 nguyên liệu (`chonoi/inventory.KINDS`).

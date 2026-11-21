@@ -42,10 +42,16 @@ def main(argv=None) -> int:
     p.add_argument("--inventory")
     p.add_argument("--inventory-out", dest="inventory_out")
     p.add_argument("--snapshot-every", dest="snapshot_every", type=_int("snapshot-every"), default=10)
+    p.add_argument("--days", type=_int("days"))
     a = p.parse_args(argv)
     try:
+        if a.days is not None and a.mode != "day":
+            raise BadInput("--days chỉ dùng với --mode day")
+        if a.mode == "day" and not (1 <= (a.days if a.days is not None else 1) <= 5):
+            raise BadInput("--days phải là số nguyên từ 1 đến 5")
         if a.mode == "day":
-            raise BadInput("--mode day chưa hỗ trợ ở contract v1.0 (có từ v1.1)")
+            # TODO(Duy, AC-P2-06): bỏ dòng này khi runner có day (xem docs/contracts/README.md §5)
+            raise BadInput("--mode day đang được cài (AC-P2-06)")
         if a.ticks < 0:
             raise BadInput("--ticks phải >= 0")
         if a.snapshot_every <= 0:
