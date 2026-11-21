@@ -1,0 +1,16 @@
+# 2026-11-21T02:18:46Z commit-base f0a1906
+test_first_choke_at_t_plus_59 (tests.test_gather_slice1.Choke.test_first_choke_at_t_plus_59) ... ok
+test_surfacing_on_choke_step_avoids_choke (tests.test_gather_slice1.Choke.test_surfacing_on_choke_step_avoids_choke) ... ok
+test_dive_event_with_pos_after_move (tests.test_gather_slice1.DiveSurface.test_dive_event_with_pos_after_move) ... ok
+test_no_event_without_crossing (tests.test_gather_slice1.DiveSurface.test_no_event_without_crossing) ... ok
+test_faint_drops_hold_lifo_and_ends_with_empty_inventory (tests.test_gather_slice1.Faint.test_faint_drops_hold_lifo_and_ends_with_empty_inventory) ... ok
+test_oxygen_empty_once_when_hitting_zero (tests.test_gather_slice1.Oxygen.test_oxygen_empty_once_when_hitting_zero) ... ok
+test_surface_edge_counts_as_surface (tests.test_gather_slice1.Oxygen.test_surface_edge_counts_as_surface)
+Mặt nước là d <= surface_depth (tính cả đúng mép). ... ok
+test_surface_refills_and_clamps (tests.test_gather_slice1.Oxygen.test_surface_refills_and_clamps) ... ok
+test_underwater_drains_one_per_tick (tests.test_gather_slice1.Oxygen.test_underwater_drains_one_per_tick) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.389s
+
+OK
