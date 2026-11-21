@@ -1,0 +1,12 @@
+# Smoke hai tiến trình (PRD-0 mục G) — 2026-11-21T02:39:56Z, base a52fd29
+$ python3 -m chonoi.headless --mode gather --seed 42 --scenario dock.json --inputs dock-inputs.json --ticks 1 --out gather.jsonl --inventory-out catch.json
+exit=0
+--- catch.json
+{"items":{"bong_sung":2,"ca_loc":1}}
+--- gather.jsonl (event + end)
+{"type":"event","tick":1,"phase":"gather","name":"gather_end","data":{"reason":"docked","inventory":{"items":{"bong_sung":2,"ca_loc":1}}}}
+{"type":"end","ticks":1,"sim_tick":1,"mode":"gather","state":"finished","reason":"docked","money":0,"earned":0,"reputation":3.0,"score":300}
+$ python3 -m chonoi.headless --mode quan --seed 42 --inventory catch.json --ticks 0 --out quan.jsonl
+exit=0
+--- quan snapshot tick 0: stock
+{'bong_sung': 2, 'ca_loc': 1}

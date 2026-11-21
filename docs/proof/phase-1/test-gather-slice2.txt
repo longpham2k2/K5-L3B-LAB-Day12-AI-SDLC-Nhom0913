@@ -1,0 +1,21 @@
+# 2026-11-21T02:39:56Z base a52fd29
+test_catch_nearest_school_full_yield (tests.test_gather_slice2.Catch.test_catch_nearest_school_full_yield) ... ok
+test_catch_tie_by_id_and_edge (tests.test_gather_slice2.Catch.test_catch_tie_by_id_and_edge) ... ok
+test_cooldown_reuse_from_t_plus_l (tests.test_gather_slice2.Catch.test_cooldown_reuse_from_t_plus_l)
+Cooldown L đặt ở tick t dùng lại từ t+L. ... ok
+test_hold_full_keeps_school_no_cooldown_no_other_school (tests.test_gather_slice2.Catch.test_hold_full_keeps_school_no_cooldown_no_other_school) ... ok
+test_no_catch_at_surface_or_out_of_range (tests.test_gather_slice2.Catch.test_no_catch_at_surface_or_out_of_range) ... ok
+test_hold_full_keeps_node (tests.test_gather_slice2.Gather.test_hold_full_keeps_node) ... ok
+test_nearest_then_id_and_skip_not_ready (tests.test_gather_slice2.Gather.test_nearest_then_id_and_skip_not_ready) ... ok
+test_no_pick_underwater (tests.test_gather_slice2.Gather.test_no_pick_underwater) ... ok
+test_outside_radius_nothing (tests.test_gather_slice2.Gather.test_outside_radius_nothing) ... ok
+test_pick_at_exact_radius_edge (tests.test_gather_slice2.Gather.test_pick_at_exact_radius_edge)
+Ví dụ mục D: nút đúng mép bán kính hái (2.0 m) vẫn hái được. ... ok
+test_regrown_then_pick_same_step (tests.test_gather_slice2.Gather.test_regrown_then_pick_same_step) ... ok
+test_dock_edge_on_last_step_is_docked (tests.test_gather_slice2.LastStep.test_dock_edge_on_last_step_is_docked) ... ok
+test_pick_on_last_step_goes_to_inventory (tests.test_gather_slice2.LastStep.test_pick_on_last_step_goes_to_inventory) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.706s
+
+OK
